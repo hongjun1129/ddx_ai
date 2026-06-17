@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/chest-pain-workflow-v8_1.html"
+    }
+  ]
+}

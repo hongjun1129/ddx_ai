@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
+const isMainModule = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 const allowedValues = new Set(["미확인", "있음", "없음", "해당없음"]);
 
 await loadDotEnv(path.join(root, ".env"));
@@ -27,9 +28,11 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(port, () => {
-  console.log(`Chest pain workflow demo: http://localhost:${port}`);
-});
+if (isMainModule) {
+  server.listen(port, () => {
+    console.log(`Chest pain workflow demo: http://localhost:${port}`);
+  });
+}
 
 async function loadDotEnv(filePath) {
   try {
@@ -46,7 +49,7 @@ async function loadDotEnv(filePath) {
   }
 }
 
-async function handleExtractClues(req, res) {
+export async function handleExtractClues(req, res) {
   const payload = await readJsonBody(req);
   const apiKey = process.env.LLM_API_KEY || process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -307,6 +310,16 @@ function contentType(filePath) {
 }
 
 function readJsonBody(req) {
+  if (req.body !== undefined) {
+    if (typeof req.body === "string") {
+      return Promise.resolve(JSON.parse(req.body || "{}"));
+    }
+    if (Buffer.isBuffer(req.body)) {
+      return Promise.resolve(JSON.parse(req.body.toString("utf8") || "{}"));
+    }
+    return Promise.resolve(req.body || {});
+  }
+
   return new Promise((resolve, reject) => {
     let body = "";
     req.setEncoding("utf8");

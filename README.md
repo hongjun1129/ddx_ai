@@ -22,13 +22,19 @@ npm.cmd start
 
 ## LLM 추출
 
-브라우저는 API 키를 직접 사용하지 않습니다. `server.js`의 `/api/extract-clues`가 서버에서 LLM을 호출합니다.
+브라우저는 API 키를 직접 사용하지 않습니다. 로컬 실행에서는 `server.js`의 `/api/extract-clues`가, Vercel 배포에서는 `api/extract-clues.js` 서버리스 함수가 서버에서 LLM을 호출합니다.
 
 1. `.env.example`을 참고해 `.env`를 만듭니다.
 2. `LLM_API_KEY`와 `LLM_MODEL`을 채웁니다.
 3. `npm start`로 서버를 실행합니다.
 
 `LLM_API_KEY`가 비어 있으면 개발용 mock 추출이 사용됩니다. mock 결과도 의사 확인 모달을 거친 뒤에만 체크리스트 상태에 반영됩니다.
+
+## Vercel 배포
+
+`vercel.json`은 `/` 요청을 `chest-pain-workflow-v8_1.html` 정적 페이지로 rewrite합니다. `/api/extract-clues`는 Vercel 서버리스 함수로 동작하므로 Vercel에서 `npm start`를 실행하도록 설정하지 않아도 됩니다.
+
+실제 LLM 호출을 쓰려면 Vercel Project Settings의 Environment Variables에 `LLM_API_KEY` 또는 `OPENAI_API_KEY`를 추가합니다. 키가 없으면 mock 추출로 동작합니다.
 
 ## 데이터 생성
 
