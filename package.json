@@ -1,0 +1,11 @@
+{
+  "name": "chest-pain-workflow-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:data": "node scripts/build-clinical-data.mjs",
+    "start": "node server.js",
+    "dev": "node server.js"
+  }
+}
