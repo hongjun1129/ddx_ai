@@ -84,7 +84,7 @@ async function init() {
     renderChecklistModal();
     setStatus(`임상 데이터 로드 완료: 진단 ${data.meta.counts.diagnoses}개, 체크리스트 ${data.meta.counts.checklistItems}개`, "ok");
   } catch (error) {
-    setStatus(`데이터 로딩 실패: ${error.message}. npm start로 서버를 실행한 뒤 접속하세요.`, "error");
+    setStatus(`데이터 로딩 실패: ${error.message}. npm run dev로 로컬 서버를 실행한 뒤 접속하세요.`, "error");
   }
 }
 
@@ -148,18 +148,12 @@ async function analyze() {
     const vitals = collectVitals();
     const vitalItems = buildVitalExtraction(vitals);
     const candidateChecklist = buildCandidateChecklist(note, vitalItems);
-    const res = await fetch("/api/extract-clues", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        patient: collectPatient(),
-        vitals,
-        note,
-        candidateChecklist,
-      }),
+    const result = clientMockExtractClues({
+      patient: collectPatient(),
+      vitals,
+      note,
+      candidateChecklist,
     });
-    if (!res.ok) throw new Error(await res.text());
-    const result = await res.json();
     appState.lastExtraction = result;
 
     const llmItems = (result.items || []).map((item) => toReviewItem(item, "llm")).filter(Boolean);
@@ -177,6 +171,101 @@ async function analyze() {
     btn.disabled = false;
     btn.textContent = "임상 단서 추출";
   }
+}
+
+function clientMockExtractClues(payload) {
+  const note = String(payload.note || "");
+  const lower = note.toLowerCase();
+  const candidates = payload.candidateChecklist || [];
+  const items = [];
+
+  for (const candidate of candidates) {
+    if (!/^AK-\d+$/i.test(candidate.id || "")) continue;
+    const label = `${candidate.label || ""} ${candidate.displayLabel || ""}`.toLowerCase();
+    const found = clientInferValue(label, lower, note, payload.vitals || {});
+    if (!found) continue;
+    items.push({
+      id: candidate.id,
+      value: found.value,
+      confidence: found.confidence,
+      quote: found.quote,
+      rationale: found.rationale,
+    });
+  }
+
+  return {
+    items,
+    summary: clientMockSummary(note),
+    warnings: ["Vercel static build: using browser-side mock extraction."],
+    mock: true,
+  };
+}
+
+function clientInferValue(label, lower, note, vitals) {
+  const positive = (value, quote, rationale, confidence = 0.84) => ({ value, quote, rationale, confidence });
+  const has = (...patterns) => patterns.some((pattern) => pattern.test(note) || pattern.test(lower));
+
+  if (/shock|저혈압|sbp|hypotension/.test(label) && Number(vitals.sbp) > 0 && Number(vitals.sbp) < 90) {
+    return positive(YES, `SBP ${vitals.sbp}`, "활력징후에서 저혈압 기준을 만족합니다.", 0.95);
+  }
+  if (/spo2|저산소|hypox/.test(label) && Number(vitals.spo2) > 0 && Number(vitals.spo2) < 95) {
+    return positive(YES, `SpO2 ${vitals.spo2}%`, "활력징후에서 산소포화도 저하가 확인됩니다.", 0.95);
+  }
+  if (/tachy|빈맥|hr/.test(label) && Number(vitals.hr) > 100) {
+    return positive(YES, `HR ${vitals.hr}`, "활력징후에서 빈맥 기준을 만족합니다.", 0.9);
+  }
+  if (/tachypnea|빈호흡|rr|호흡수/.test(label) && Number(vitals.rr) > 20) {
+    return positive(YES, `RR ${vitals.rr}`, "활력징후에서 빈호흡 기준을 만족합니다.", 0.9);
+  }
+  if (/발열|fever/.test(label) && Number(vitals.bt) >= 38) {
+    return positive(YES, `BT ${vitals.bt}`, "활력징후에서 발열 기준을 만족합니다.", 0.92);
+  }
+  if (/severe bp|고혈압|hypertension/.test(label) && (Number(vitals.sbp) >= 180 || Number(vitals.dbp) >= 120)) {
+    return positive(YES, `BP ${vitals.sbp}/${vitals.dbp}`, "중증 혈압 상승 기준을 만족합니다.", 0.88);
+  }
+  if (/fever|발열/.test(label) && has(/발열 없음|no fever/i)) {
+    return positive(NO, "발열 없음", "명시적 부정 표현이 있습니다.", 0.9);
+  }
+  if (/pressure|압박|쥐어짜|흉골하|substernal/.test(label) && has(/압박감|쥐어짜|흉골하|substernal pressure/i)) {
+    return positive(YES, "흉골하 압박감", "입력 기록에 압박성 흉통이 명시되어 있습니다.");
+  }
+  if (/radiation|방사|팔|jaw|턱|등/.test(label) && has(/좌측 팔로 방사|팔.*방사|방사/i)) {
+    return positive(YES, "좌측 팔로 방사", "방사통이 기록되어 있습니다.");
+  }
+  if (/diaphoresis|식은땀|발한|sweat/.test(label) && has(/식은땀|발한|diaphoresis/i)) {
+    return positive(YES, "식은땀 동반", "동반 증상으로 발한이 기록되어 있습니다.");
+  }
+  if (/dyspnea|호흡곤란|숨/.test(label) && has(/호흡곤란|dyspnea|숨.*차/i)) {
+    return positive(YES, "호흡곤란", "호흡곤란이 기록되어 있습니다.", 0.72);
+  }
+  if (/st elevation|stemi|ecg/.test(label) && has(/st elevation 없음|no st elevation/i)) {
+    return positive(NO, "ECG ST elevation 없음", "ECG의 ST elevation 부정이 명시되어 있습니다.", 0.88);
+  }
+  if (/troponin|hs-ctn|트로포닌/.test(label) && has(/troponin pending|트로포닌.*대기|pending/i)) {
+    return positive(UNKNOWN, "Troponin pending", "검사 결과가 아직 대기 상태입니다.", 0.8);
+  }
+  if (/acs risk|hypertension|고혈압|htn/.test(label) && has(/\bhtn\b|고혈압|hypertension/i)) {
+    return positive(YES, "HTN", "과거력에 고혈압이 기록되어 있습니다.");
+  }
+  if (/diabetes|당뇨|\bdm\b/.test(label) && has(/\bdm\b|당뇨|diabetes/i)) {
+    return positive(YES, "DM", "과거력에 당뇨가 기록되어 있습니다.");
+  }
+  if (/smok|흡연/.test(label) && has(/current smoker|흡연|smok/i)) {
+    return positive(YES, "current smoker", "현재 흡연이 기록되어 있습니다.");
+  }
+  return null;
+}
+
+function clientMockSummary(note) {
+  const parts = [];
+  if (/압박감|흉골하/.test(note)) parts.push("압박성 흉통");
+  if (/방사/.test(note)) parts.push("방사통");
+  if (/식은땀/.test(note)) parts.push("발한");
+  if (/호흡곤란/.test(note)) parts.push("호흡곤란");
+  if (/HTN|고혈압/.test(note)) parts.push("HTN");
+  if (/DM|당뇨/.test(note)) parts.push("DM");
+  if (/smoker|흡연/.test(note)) parts.push("흡연");
+  return parts.length ? `${parts.join(", ")} 단서를 mock으로 추출했습니다.` : "mock 추출에서 명확한 단서를 찾지 못했습니다.";
 }
 
 function toReviewItem(raw, source) {

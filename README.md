@@ -7,7 +7,7 @@
 ```bash
 npm install
 npm run build
-npm start
+npm run dev
 ```
 
 브라우저에서 `http://localhost:3000`으로 접속합니다.
@@ -16,25 +16,19 @@ PowerShell에서 `npm.ps1` 실행 정책 오류가 나면 아래처럼 `npm.cmd`
 
 ```powershell
 npm.cmd install
-npm.cmd run build:data
-npm.cmd start
+npm.cmd run build
+npm.cmd run dev
 ```
 
-## LLM 추출
+## 단서 추출
 
-브라우저는 API 키를 직접 사용하지 않습니다. 로컬 실행에서는 `server.js`의 `/api/extract-clues`가, Vercel 배포에서는 `api/extract-clues.js` 서버리스 함수가 서버에서 LLM을 호출합니다.
+Vercel 배포에서는 서버리스 함수를 사용하지 않고 브라우저 안에서 mock 단서 추출을 수행합니다. 체크리스트 반영은 기존처럼 의사 확인 모달을 거친 뒤에만 적용됩니다.
 
-1. `.env.example`을 참고해 `.env`를 만듭니다.
-2. `LLM_API_KEY`와 `LLM_MODEL`을 채웁니다.
-3. `npm start`로 서버를 실행합니다.
-
-`LLM_API_KEY`가 비어 있으면 개발용 mock 추출이 사용됩니다. mock 결과도 의사 확인 모달을 거친 뒤에만 체크리스트 상태에 반영됩니다.
+실제 LLM 서버 연동은 Vercel 화면 확인이 안정화된 뒤 별도 API로 다시 붙이는 구조가 안전합니다.
 
 ## Vercel 배포
 
-`vercel.json`은 Vercel 빌드 명령을 `npm run build`, 출력 폴더를 `public`으로 고정합니다. `/api/extract-clues`는 독립형 Vercel 서버리스 함수로 동작하므로 Vercel에서 `npm start`를 실행하도록 설정하지 않아도 됩니다.
-
-실제 LLM 호출을 쓰려면 Vercel Project Settings의 Environment Variables에 `LLM_API_KEY` 또는 `OPENAI_API_KEY`를 추가합니다. 키가 없으면 mock 추출로 동작합니다.
+`vercel.json`은 Vercel 빌드 명령을 `npm run build`, 출력 폴더를 `public`으로 고정합니다. 이 배포는 순수 정적 사이트이므로 Vercel Serverless Function을 만들지 않습니다.
 
 ## 데이터 생성
 

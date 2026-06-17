@@ -10,7 +10,7 @@
     "build:data": "node scripts/build-clinical-data.mjs",
     "build:public": "node scripts/build-public.mjs",
     "build": "npm run build:data && npm run build:public",
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "npm run build:public",
+    "dev": "node scripts/dev-server.mjs"
   }
 }
