@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>흉통 평가 워크플로우 · 임상 추론 보조 AI</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  :root{
+    --bg:#f2f4f7;
+    --card:#ffffff;
+    --border:#e2e5ea;
+    --border-soft:#eceff2;
+    --ink:#1e293b;
+    --ink-sub:#475569;
+    --muted:#64748b;
+    --faint:#94a3b8;
+
+    --dark:#10182a;
+    --dark-line:#293349;
+    --dark-text:#e8edf5;
+    --dark-muted:#8b97ab;
+
+    --danger:#b42318;  --danger-bg:#fdf0ee;  --danger-bd:#f4d2cc;
+    --warn:#9a5a0a;    --warn-bg:#fdf4e6;    --warn-bd:#f3e1bf;
+    --safe:#2f6b45;    --safe-bg:#eef5f0;    --safe-bd:#d2e5d9;
+    --accent:#2358c9;  --accent-bg:#eef2fb;  --accent-bd:#d4def6;
+
+    --tag-bg:#f1f4f7;  --tag-tx:#5b6776;  --tag-bd:#e4e8ed;
+
+    --shadow:0 1px 2px rgba(15,23,42,.04),0 1px 3px rgba(15,23,42,.05);
+    --shadow-lg:0 24px 60px rgba(15,23,42,.26),0 8px 18px rgba(15,23,42,.12);
+    --r:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Pretendard','Pretendard Variable',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic','Segoe UI',sans-serif;
+    background:var(--bg);color:var(--ink);font-size:13px;line-height:1.45;-webkit-font-smoothing:antialiased;
+  }
+  .app{max-width:1560px;margin:0 auto;min-width:1080px;display:flex;flex-direction:column;min-height:100vh;}
+  button{font-family:inherit;}
+
+  /* form inputs */
+  .fin{width:100%;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-family:inherit;font-size:13px;color:var(--ink);background:#fff;outline:none;}
+  .fin:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg);}
+  select.fin{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;padding-right:28px;cursor:pointer;}
+  .num{width:54px;border:1px solid var(--border);border-radius:6px;padding:6px 6px;font-size:14px;font-weight:800;text-align:center;color:var(--ink);background:#fff;outline:none;font-family:inherit;}
+  .num:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-bg);}
+  .num.abn{color:var(--danger);border-color:#f0c9c4;background:#fffafa;}
+
+  /* ===== TOP BAR ===== */
+  .topbar{background:var(--dark);color:var(--dark-text);display:flex;align-items:center;gap:14px;padding:10px 18px;border-bottom:1px solid #0b1220;}
+  .brand{display:flex;align-items:center;gap:13px;flex:none;}
+  .brand .bar{width:3px;height:30px;border-radius:2px;background:#3b82f6;}
+  .brand .t1{font-size:15px;font-weight:700;letter-spacing:-.2px;line-height:1.2;}
+  .brand .t2{font-size:11px;color:var(--dark-muted);margin-top:2px;letter-spacing:.2px;}
+  .disc{font-size:11px;color:#9aa6bb;line-height:1.45;border-left:1px solid var(--dark-line);padding-left:14px;max-width:540px;}
+  .disc b{color:#c5cddd;font-weight:700;}
+  .top-right{margin-left:auto;display:flex;align-items:center;gap:13px;flex:none;}
+  .top-time{font-size:11.5px;color:var(--dark-muted);white-space:nowrap;}
+  .top-btn{border:1px solid var(--dark-line);background:transparent;color:#c2cbda;border-radius:8px;padding:8px 14px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;}
+  .top-btn:hover{background:#1d2740;}
+
+  /* ===== GRID ===== */
+  .grid{flex:1;display:grid;grid-template-columns:286px minmax(340px,1fr) 396px;gap:14px;padding:12px 18px;align-items:start;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);}
+  .card + .card{margin-top:12px;}
+  .card-head{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;border-bottom:1px solid var(--border-soft);}
+  .card-title{font-weight:700;font-size:13px;letter-spacing:-.1px;}
+  .ghost-btn{border:1px solid var(--border);background:#fff;color:var(--muted);font-size:11.5px;border-radius:7px;padding:6px 12px;cursor:pointer;font-weight:600;}
+  .ghost-btn:hover{background:#f8fafc;}
+  .pad{padding:13px 15px;}
+
+  .tag{font-size:11px;font-weight:700;border-radius:6px;padding:3px 9px;white-space:nowrap;display:inline-block;border:1px solid transparent;}
+  .tag.danger{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-bd);}
+  .tag.warn{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-bd);}
+  .tag.safe{background:var(--safe-bg);color:var(--safe);border-color:var(--safe-bd);}
+  .tag.neutral{background:var(--tag-bg);color:var(--tag-tx);border-color:var(--tag-bd);}
+
+  .empty-hint{font-size:11.8px;color:var(--faint);line-height:1.6;}
+
+  /* ===== LEFT : PATIENT ===== */
+  .fgrid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .fld{margin-bottom:11px;}
+  .fld:last-child{margin-bottom:0;}
+  .fld label{display:block;font-size:10.5px;font-weight:700;color:var(--faint);letter-spacing:.3px;margin-bottom:5px;}
+  .suffix-wrap{position:relative;}
+  .suffix-wrap .fin{padding-right:28px;}
+  .suffix{position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--muted);pointer-events:none;}
+
+  .vital-list{padding:8px 15px 12px;}
+  .vrow{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border-soft);}
+  .vrow:last-child{border-bottom:none;}
+  .vrow .vk{width:42px;font-size:11px;font-weight:700;color:var(--faint);letter-spacing:.3px;}
+  .vin{display:flex;align-items:center;gap:6px;}
+  .vin .slash{color:var(--faint);font-weight:700;}
+  .vrow .vu{font-size:11px;color:var(--muted);}
+
+  /* ===== CENTER ===== */
+  .free{margin:13px 15px 0;border:1px solid var(--border);border-radius:9px;background:#fcfcfd;}
+  .free textarea{width:100%;border:none;background:transparent;resize:vertical;min-height:112px;padding:13px 14px;font-family:inherit;font-size:12.8px;color:var(--ink-sub);line-height:1.85;outline:none;}
+  .free textarea::placeholder{color:#b7c0cb;}
+  .free-foot{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid var(--border-soft);}
+  .btn{border-radius:8px;padding:8px 14px;font-size:12.2px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--ink-sub);}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .btn.primary:hover{background:#1d4eb5;}
+  .btn:hover{background:#f8fafc;}
+  .btn.primary:hover{background:#1d4eb5;}
+  .btn:disabled{opacity:.62;cursor:not-allowed;}
+  .status-line{min-height:18px;padding:0 15px 12px;font-size:11.6px;color:var(--muted);}
+  .status-line.error{color:var(--danger);}
+  .status-line.ok{color:var(--safe);}
+
+  .clue-head{display:flex;align-items:center;gap:10px;padding:14px 15px 0;}
+  .clue-head .ct{font-weight:700;font-size:13px;}
+  .clue-head .open-link{margin-left:auto;}
+  .clue-sec2{padding:14px 15px 0;margin-top:7px;border-top:1px solid var(--border-soft);}
+  .clue-sec2 .ct{font-weight:700;font-size:13px;}
+  .open-link{font-size:11.8px;color:var(--accent);font-weight:700;cursor:pointer;border:1px solid var(--accent-bd);background:#fff;border-radius:7px;padding:6px 11px;white-space:nowrap;}
+  .open-link:hover{background:var(--accent-bg);}
+
+  .kw-chips{display:flex;flex-wrap:wrap;gap:8px;padding:11px 15px 14px;}
+  .kw-chips:empty{padding:0;}
+  .kw{font-size:12.5px;font-weight:600;padding:7px 12px;border-radius:8px;background:#f5f7f9;border:1px solid var(--border);color:var(--ink-sub);display:flex;align-items:center;gap:8px;}
+  .kw .dot{width:6px;height:6px;border-radius:50%;background:#94a3b8;}
+  .kw.warn{background:var(--warn-bg);border-color:var(--warn-bd);color:var(--warn);}
+  .kw.warn .dot{background:var(--warn);}
+  .kw.wait{color:var(--muted);}
+  .kw.wait .dot{background:transparent;border:1.5px solid #b6c0cc;width:6px;height:6px;}
+  .kw.risk{background:#fafbfc;border-color:var(--border);color:var(--ink-sub);}
+  .kw.risk .dot{background:#d59a4e;}
+
+  /* ===== RIGHT : DIFFERENTIAL ===== */
+  .dx-top{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;border-bottom:1px solid var(--border-soft);}
+  .dx-group-h{display:flex;align-items:center;gap:9px;padding:12px 15px 6px;}
+  .dx-group-h .mk{width:3px;height:14px;border-radius:2px;}
+  .dx-group-h.red .mk{background:var(--danger);}
+  .dx-group-h.gray .mk{background:#94a3b8;}
+  .dx-group-h .ttl{font-weight:800;font-size:12.5px;letter-spacing:-.1px;}
+  .dx-group-h.red .ttl{color:var(--danger);}
+
+  .dx-list{padding:0 11px;}
+  .dx-card{display:grid;grid-template-columns:25px 1fr 12px;gap:11px;align-items:start;padding:9px 9px;border-radius:9px;cursor:pointer;transition:.12s;border:1px solid transparent;}
+  .dx-card:hover{background:#f8fafc;border-color:var(--border);}
+  .rank{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12.5px;margin-top:1px;}
+  .rank.danger{background:var(--danger);color:#fff;}
+  .rank.gray{background:#475569;color:#fff;}
+  .dx-main{min-width:0;}
+  .dx-name{font-size:13.5px;font-weight:700;letter-spacing:-.2px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;line-height:1.3;}
+  .dx-name.danger{color:var(--danger);}
+  .dx-need{margin-top:5px;font-size:11.5px;color:var(--ink-sub);line-height:1.5;}
+  .dx-need .nl{font-size:9.5px;font-weight:800;color:var(--faint);border:1px solid #e3e7ec;border-radius:4px;padding:1px 6px;margin-right:7px;letter-spacing:.2px;}
+  .dx-chev{color:#c4c9d0;font-size:16px;font-weight:700;margin-top:1px;}
+  .dx-divider{height:1px;background:var(--border-soft);margin:8px 15px;}
+
+  /* ===== MODALS ===== */
+  .backdrop{position:fixed;inset:0;background:rgba(15,23,42,.48);display:none;align-items:flex-start;justify-content:center;padding:46px 20px;z-index:50;}
+  .backdrop.open{display:flex;}
+  .modal{background:#fff;border-radius:14px;box-shadow:var(--shadow-lg);width:100%;max-height:86vh;display:flex;flex-direction:column;overflow:hidden;}
+  .modal.sm{max-width:560px;}
+  .modal.lg{max-width:880px;}
+  .m-head{display:flex;align-items:flex-start;justify-content:space-between;padding:16px 20px 14px;border-bottom:1px solid var(--border-soft);}
+  .m-head .mt{font-weight:800;font-size:15.5px;}
+  .m-head .ms{font-size:11.8px;color:var(--muted);margin-top:3px;}
+  .m-x{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:#f6f8fa;color:#64748b;cursor:pointer;font-size:14px;flex:none;}
+  .m-x:hover{background:#eef1f4;}
+  .m-body{padding:16px 20px;overflow-y:auto;}
+  .m-foot{display:flex;align-items:center;gap:8px;justify-content:flex-end;padding:12px 20px;border-top:1px solid var(--border-soft);background:#fafbfc;}
+
+  .cl-cat{border:1px solid var(--border-soft);border-radius:10px;margin-bottom:11px;overflow:hidden;}
+  .cl-cat-h{display:flex;align-items:center;gap:9px;padding:10px 14px;background:#fafbfc;font-weight:700;font-size:12.5px;}
+  .cl-cat-h .cnt{margin-left:auto;font-size:10px;font-weight:700;border-radius:5px;padding:2px 8px;background:var(--safe-bg);color:var(--safe);border:1px solid var(--safe-bd);}
+  .cl-cat-h .cnt.zero{background:var(--tag-bg);color:#9aa6b4;border-color:var(--tag-bd);}
+  .cl-cat-b{padding:4px 14px 10px;}
+  .cl-it{display:flex;align-items:center;gap:11px;padding:8px 0;border-bottom:1px solid var(--border-soft);font-size:12.3px;}
+  .cl-it:last-child{border-bottom:none;}
+  .cl-it .st{width:18px;height:18px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;}
+  .cl-it .st svg{width:11px;height:11px;}
+  .st.y{background:#7c8a99;color:#fff;}
+  .st.n{background:#eef1f4;color:#9aa6b4;}
+  .st.q{background:var(--warn);color:#fff;}
+  .st.na{background:#f8fafc;color:#b7c0cb;border:1px solid var(--border);}
+  .cl-it .lab{color:var(--ink-sub);min-width:0;flex:1;}
+  .cl-it .from{font-size:10.5px;color:var(--faint);font-style:italic;max-width:220px;text-align:right;}
+  .cl-it .mini-select{width:92px;border:1px solid var(--border);border-radius:6px;padding:4px 6px;font-size:11.2px;color:var(--ink-sub);background:#fff;}
+  .detail-line{display:block;margin-top:3px;color:var(--faint);font-size:10.7px;line-height:1.45;}
+
+  .review-summary{font-size:12px;color:var(--ink-sub);line-height:1.6;padding:12px 20px;border-bottom:1px solid var(--border-soft);background:#fcfcfd;}
+  .review-row{display:grid;grid-template-columns:112px 1fr 104px;gap:12px;align-items:start;padding:11px 0;border-bottom:1px solid var(--border-soft);}
+  .review-row:last-child{border-bottom:none;}
+  .review-sec{font-size:10.8px;font-weight:800;color:var(--faint);letter-spacing:.2px;}
+  .review-main{min-width:0;}
+  .review-label{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.45;}
+  .review-meta{font-size:11px;color:var(--muted);line-height:1.55;margin-top:4px;}
+  .review-meta.warn{color:var(--warn);}
+  .review-select{width:100%;border:1px solid var(--border);border-radius:7px;padding:6px 8px;font-size:12px;color:var(--ink-sub);background:#fff;}
+
+  .dxt{width:100%;border-collapse:collapse;}
+  .dxt th{font-size:10.5px;color:var(--faint);font-weight:700;text-align:left;padding:0 10px 9px;border-bottom:1px solid var(--border);}
+  .dxt td{padding:11px 10px;border-bottom:1px solid var(--border-soft);font-size:12.2px;vertical-align:middle;}
+  .dxt tr:hover td{background:#fafbfc;}
+  .dxt .rk{width:25px;height:25px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;background:#eef1f5;color:#566273;}
+  .dxt .nm{font-weight:700;color:var(--ink);}
+  .dxt .nm.danger{color:var(--danger);}
+  .prob{display:flex;align-items:center;gap:9px;min-width:120px;}
+  .prob .bar{flex:1;height:6px;border-radius:99px;background:#eef1f4;overflow:hidden;}
+  .prob .fill{height:100%;border-radius:99px;background:#64748b;}
+  .prob .pv{font-size:11px;font-weight:700;color:var(--ink-sub);width:42px;text-align:right;}
+  .cls-tag{font-size:10px;font-weight:700;border-radius:5px;padding:2px 7px;border:1px solid transparent;}
+  .cls-tag.danger{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-bd);}
+  .cls-tag.common{background:var(--tag-bg);color:var(--tag-tx);border-color:var(--tag-bd);}
+  .risk-dot{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:600;}
+  .rd{width:8px;height:8px;border-radius:50%;}
+  .small-step{font-size:11.5px;color:var(--muted);}
+
+  @media (max-width:1180px){.grid{grid-template-columns:264px 1fr 372px;} .disc{max-width:380px;}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== TOP BAR ===== -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="bar"></div>
+      <div>
+        <div class="t1">흉통 평가 워크플로우</div>
+        <div class="t2">임상 추론 보조 AI</div>
+      </div>
+    </div>
+    <div class="disc"><b>유의</b> 본 도구는 임상 의사결정 보조용입니다. 제시된 감별진단·필요검사는 참고용이며, 모든 진단·처치의 최종 판단과 책임은 의료진에게 있습니다.</div>
+    <div class="top-right">
+      <span class="top-time" id="rec-time"></span>
+      <button class="top-btn">진료 요약</button>
+    </div>
+  </header>
+
+  <!-- ===== GRID ===== -->
+  <div class="grid">
+
+    <!-- ============ LEFT : PATIENT ============ -->
+    <aside class="col-patient">
+      <div class="card">
+        <div class="card-head"><div class="card-title">환자 정보</div></div>
+        <div class="pad" style="padding-top:13px">
+          <div class="fld"><label>성명</label><input class="fin" id="pt-name" type="text" placeholder="성명 입력"></div>
+          <div class="fgrid2">
+            <div class="fld" style="margin-bottom:0">
+              <label>나이</label>
+              <div class="suffix-wrap"><input class="fin" id="age" type="text" inputmode="numeric"><span class="suffix">세</span></div>
+            </div>
+            <div class="fld" style="margin-bottom:0">
+              <label>성별</label>
+              <select class="fin" id="sex"><option value="" disabled selected>선택</option><option>남성</option><option>여성</option></select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title">Vital Sign</div></div>
+        <div class="vital-list">
+          <div class="vrow">
+            <span class="vk">BP</span>
+            <div class="vin"><input class="num" id="sbp" type="text" inputmode="numeric" oninput="calcV()"><span class="slash">/</span><input class="num" id="dbp" type="text" inputmode="numeric" oninput="calcV()"></div>
+            <span class="vu">mmHg</span>
+          </div>
+          <div class="vrow">
+            <span class="vk">HR</span>
+            <div class="vin"><input class="num" id="hr" type="text" inputmode="numeric" oninput="calcV()"></div>
+            <span class="vu">bpm</span>
+          </div>
+          <div class="vrow">
+            <span class="vk">RR</span>
+            <div class="vin"><input class="num" id="rr" type="text" inputmode="numeric" oninput="calcV()"></div>
+            <span class="vu">/min</span>
+          </div>
+          <div class="vrow">
+            <span class="vk">SpO₂</span>
+            <div class="vin"><input class="num" id="spo2" type="text" inputmode="numeric" oninput="calcV()"></div>
+            <span class="vu">%</span>
+          </div>
+          <div class="vrow">
+            <span class="vk">BT</span>
+            <div class="vin"><input class="num" id="bt" type="text" inputmode="decimal" oninput="calcV()"></div>
+            <span class="vu">℃</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ============ CENTER : INPUT + CLUES ============ -->
+    <section class="col-center">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">의사 자유 입력</div>
+          <button class="ghost-btn" onclick="clearAll()">지우기</button>
+        </div>
+        <div class="free">
+          <textarea id="note" spellcheck="false" oninput="parsePmh()" placeholder="환자 병력 · 증상 · 검사 소견을 자유롭게 입력하세요.&#10;예) 67세 남자, 2시간 전부터 흉골하 압박감, 좌측 팔로 방사 ..."></textarea>
+          <div class="free-foot">
+            <button class="btn" onclick="loadExample()">예시 불러오기</button>
+            <button id="analyze-btn" class="btn primary" style="margin-left:auto" onclick="analyze()">임상 단서 추출</button>
+          </div>
+        </div>
+        <div id="analysis-status" class="status-line"></div>
+
+        <!-- 임상 단서 -->
+        <div class="clue-head">
+          <div class="ct">임상 단서</div>
+          <button id="cl-link" class="open-link" style="display:none" onclick="openModal('clModal')">체크리스트 전체 보기 ›</button>
+        </div>
+        <div id="clue-empty" class="empty-hint" style="padding:14px 15px;">자유입력 내용을 분석하면 임상 단서가 키워드로 표시됩니다.</div>
+        <div class="kw-chips" id="clue-kw"></div>
+
+        <!-- 기저질환 · 위험인자 -->
+        <div class="clue-sec2"><div class="ct">기저질환 · 위험인자</div></div>
+        <div id="pmh-empty" class="empty-hint" style="padding:14px 15px;">자유입력에서 기저질환·위험인자가 자동 추출됩니다.</div>
+        <div class="kw-chips" id="pmh-chips"></div>
+      </div>
+    </section>
+
+    <!-- ============ RIGHT : DIFFERENTIAL ============ -->
+    <aside class="col-dx">
+      <div class="card">
+        <div class="dx-top">
+          <div class="card-title">감별 진단</div>
+          <button id="dx-link" class="open-link" style="display:none" onclick="openModal('dxModal')">전체 순위 보기 ›</button>
+        </div>
+
+        <div id="dx-empty" class="empty-hint" style="padding:30px 18px;text-align:center;">환자 정보 입력 후 <b>임상 단서 추출</b>을 누르면<br>감별 진단이 순위대로 표시됩니다.</div>
+
+        <div id="dx-content" style="display:none"></div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<!-- ================= MODAL : CHECKLIST ================= -->
+<div class="backdrop" id="clModal" onclick="bgClose(event,'clModal')">
+  <div class="modal sm">
+    <div class="m-head">
+      <div>
+        <div class="mt">전체 체크리스트</div>
+        <div class="ms">입력 단서가 자동 반영된 결과 · 회색은 미해당/음성</div>
+      </div>
+      <button class="m-x" onclick="closeModal('clModal')">✕</button>
+    </div>
+    <div class="m-body" id="cl-modal-body"></div>
+  </div>
+</div>
+
+<!-- ================= MODAL : EXTRACTION REVIEW ================= -->
+<div class="backdrop" id="reviewModal" onclick="bgClose(event,'reviewModal')">
+  <div class="modal lg">
+    <div class="m-head">
+      <div>
+        <div class="mt">임상 단서 확인</div>
+        <div class="ms">LLM/vital-rule 후보를 의료진이 확인한 뒤 체크리스트에 반영합니다.</div>
+      </div>
+      <button class="m-x" onclick="closeModal('reviewModal')">✕</button>
+    </div>
+    <div id="review-summary" class="review-summary"></div>
+    <div class="m-body" id="review-body"></div>
+    <div class="m-foot">
+      <button class="btn" onclick="discardReview()">취소</button>
+      <button class="btn primary" onclick="applyReview()">확정 후 반영</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODAL : FULL DIFFERENTIAL ================= -->
+<div class="backdrop" id="dxModal" onclick="bgClose(event,'dxModal')">
+  <div class="modal lg">
+    <div class="m-head">
+      <div>
+        <div class="mt">전체 감별진단 순위</div>
+        <div class="ms">현재 단서 기반 · 가능성과 위험도를 함께 표시 · 빨간 질환명 = 놓치면 안 되는 위험 질환</div>
+      </div>
+      <button class="m-x" onclick="closeModal('dxModal')">✕</button>
+    </div>
+    <div class="m-body">
+      <table class="dxt">
+        <thead>
+          <tr><th style="width:30px">#</th><th>질환</th><th style="width:56px">분류</th><th style="width:150px">가능성</th><th style="width:104px">위험도</th><th>핵심 근거</th><th style="width:148px">다음 단계</th></tr>
+        </thead>
+        <tbody id="dx-modal-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
