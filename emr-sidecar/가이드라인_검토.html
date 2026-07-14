@@ -1,0 +1,924 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>흉통 감별 도구 · 가이드라인 검토 목록</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "맑은 고딕","Malgun Gothic",system-ui,sans-serif; color: #1a1a1a; background: #f5f5f4; line-height: 1.5; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 24px 20px 60px; background: #fff; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: #555; font-size: 13px; margin-bottom: 18px; }
+  .meta { font-size: 12.5px; color: #444; background: #f0f4f8; border: 1px solid #d4dde6; border-radius: 8px; padding: 10px 14px; margin-bottom: 18px; }
+  .meta b { color: #b00; }
+  table.sum { border-collapse: collapse; font-size: 13px; margin: 12px 0 22px; }
+  table.sum td, table.sum th { border: 1px solid #ccc; padding: 5px 12px; text-align: left; }
+  table.sum th { background: #eef1f4; }
+  h2 { font-size: 16px; margin: 26px 0 8px; padding-bottom: 4px; border-bottom: 2px solid #333; }
+  .dx { margin: 0 0 14px; border: 1px solid #dcdcdc; border-radius: 8px; overflow: hidden; }
+  .dx h3 { font-size: 14.5px; margin: 0; padding: 8px 12px; background: #eef1f4; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .dxno { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #33475b; color: #fff; font-size: 12px; }
+  .dxen { color: #667; font-weight: 400; font-size: 12px; }
+  .dxcount { margin-left: auto; font-size: 11.5px; color: #556; font-weight: 400; }
+  .item { padding: 9px 12px; border-top: 1px solid #eee; font-size: 13px; }
+  .item.gap { background: #fff8f0; }
+  .item.minor { background: #fafafa; }
+  .item-head { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; }
+  .chk { width: 15px; height: 15px; }
+  .badge { font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 4px; color: #fff; }
+  .badge.gap { background: #d97706; }
+  .badge.minor { background: #6b7280; }
+  .badge.error { background: #b00; }
+  .badge.over { background: #9a7b00; }
+  .badge.ref { background: #147a3d; }
+  .field { font-weight: 700; color: #33475b; }
+  .idtag { margin-left: auto; font-size: 10.5px; color: #999; font-family: monospace; }
+  .issue, .fix, .src { margin: 3px 0; }
+  .issue b, .fix b, .src b { display: inline-block; min-width: 62px; color: #667; font-size: 11.5px; }
+  .fix { color: #084; }
+  .src { color: #667; font-size: 11.5px; }
+  .cite { color: #889; }
+  .item.over, .item.ref { border: 1px solid #e2e2e2; border-radius: 8px; margin-bottom: 8px; background: #fbfbf8; }
+  .note { font-size: 12.5px; color: #555; margin: 6px 0 14px; }
+  .foot { margin-top: 30px; padding-top: 12px; border-top: 1px solid #ccc; font-size: 11.5px; color: #777; }
+  @media print { body { background: #fff; } .wrap { max-width: none; } .item.gap { background: #fff8f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style></head>
+<body><div class="wrap">
+  <h1>흉통 감별 도구 · 최신 가이드라인 검토 목록</h1>
+  <div class="sub">위험 감별 18개 질환의 진단기준·검사·배제 포인트를 현행 가이드라인과 대조 · 작성 2026-07-14</div>
+
+  <div class="meta">
+    <b>주의:</b> 아래는 AI가 최신 가이드라인을 웹으로 대조해 도출한 <b>제안 목록(검토용)</b>이며, 아직 도구에 반영되지 않았습니다.
+    각 항목은 1차 리뷰 후 별도 에이전트의 <b>적대적 재검증(웹검색 교차확인)</b>을 통과한 것입니다. 반영 여부는 의료진이 판단하세요.
+  </div>
+
+  <table class="sum">
+    <tr><th>구분</th><th>건수</th><th>설명</th></tr>
+    <tr><td>확정 · 누락(gap)</td><td>37</td><td>load-bearing, 안전 직결 위주 — 우선 반영 권장</td></tr>
+    <tr><td>확정 · 보완(minor)</td><td>22</td><td>표현 구체화·위험인자 보강 등</td></tr>
+    <tr><td>과장(overstated)</td><td>8</td><td>근거는 있으나 과장/부분 중복 — 가볍게 참고</td></tr>
+    <tr><td>해결됨(refuted)</td><td>2</td><td>= 앞서 수정한 오류 2건, 재검증에서 해결 확인</td></tr>
+  </table>
+
+  <h2>확정 항목 59건 (질환별)</h2>
+  <div class="note">체크박스는 반영 대상 표시용입니다. 배경이 연한 주황이면 누락(gap), 회색이면 보완(minor).</div>
+  
+    <section class="dx">
+      <h3><span class="dxno">1</span> ST분절상승 심근경색 <span class="dxen"></span>
+        <span class="dxcount">누락 2 · 보완 2</span>
+      </h3>
+      
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">1-1</span>
+        </div>
+        <div class="issue"><b>지적</b> pitfalls 필드에서 후벽/우심실 MI가 subtle하다고 명시하면서도 initialTests에 추가 유도 기록이 빠져 있음. 하벽/후벽 STEMI 의심 시 우측흉부유도(V3R·V4R)와 후벽유도(V7-V9)를 기록해야 미세한/무증상 STEMI equivalent를 놓치지 않는데 이 핵심 단계가 누락됨.</div>
+        <div class="fix"><b>수정안</b> '하벽 STEMI 의심 시 우측유도 V3R·V4R로 우심실경색 평가, V1-V3 ST하강 등 후벽 의심 시 후벽유도 V7-V9 기록'을 추가. ESC는 이를 Class I로 권고.</div>
+        <div class="src"><b>근거</b> 2023 ESC ACS · <span class="cite">2023 ESC Guidelines for the management of acute coronary syndromes (Byrne et al., Eur Heart J 2023;44:3720-3826) — ECG recommendations for additional leads (V3R/V4R for RV involvement, V7-V9 for posterior/isolated ST-depression V1-V3).</span></div>
+      </div>
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">주의할 함정</span>
+          <span class="idtag">1-3</span>
+        </div>
+        <div class="issue"><b>지적</b> LBBB·paced rhythm이 판독을 방해한다고만 언급하고 대응 도구가 없음. 신규 LBBB는 더 이상 자동 STEMI-equivalent가 아니며, LBBB/심실조율 환경에서 급성 폐색을 판별하려면 (modified) Sgarbossa 기준을 적용해야 한다는 핵심 로직이 빠짐.</div>
+        <div class="fix"><b>수정안</b> 'LBBB/paced rhythm에서는 (Smith-modified) Sgarbossa 기준을 적용하여 급성 폐색을 판별; 신규 LBBB만으로 STEMI로 간주하지 않음'을 추가.</div>
+        <div class="src"><b>근거</b> 2023 ESC ACS · <span class="cite">2023 ESC Guidelines for the management of acute coronary syndromes (Byrne et al., Eur Heart J 2023;44:3720-3826) — ECG interpretation with bundle branch block/paced rhythm and Sgarbossa criteria; reperfusion driven by clinical suspicion, not LBBB alone.</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">1-2</span>
+        </div>
+        <div class="issue"><b>지적</b> '도착 즉시 12유도 ECG'로만 기술되어 정량적 목표가 없음. 가이드라인은 내원 후 10분 이내 ECG 획득·판독을 권고(Class I).</div>
+        <div class="fix"><b>수정안</b> '도착 후 10분 이내 12유도 ECG 획득 및 판독'으로 구체화.</div>
+        <div class="src"><b>근거</b> 2021 AHA/ACC chest pain · <span class="cite">2021 AHA/ACC/ASE/CHEST/SAEM/SCCT/SCMR Guideline for the Evaluation and Diagnosis of Chest Pain (Gulati et al., Circulation 2021;144:e368-e454) — 12-lead ECG within 10 min of arrival, Class 1, LOE C-LD.</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">고려 단서</span>
+          <span class="idtag">1-4</span>
+        </div>
+        <div class="issue"><b>지적</b> 전형적 흉통 위주로 기술되어 있고, 여성·고령·당뇨·CKD에서 흉통 없이 호흡곤란·실신·상복부 불편 등 비전형/무통성으로 나타날 수 있다는 anginal-equivalent 개념이 명시되지 않음.</div>
+        <div class="fix"><b>수정안</b> '여성·고령·당뇨·CKD 등에서 흉통이 경미하거나 없이 호흡곤란·오심·실신 등 비전형 증상으로 발현 가능'을 단서에 추가.</div>
+        <div class="src"><b>근거</b> 2021 AHA/ACC chest pain · <span class="cite">2021 AHA/ACC/ASE/CHEST/SAEM/SCCT/SCMR Guideline for the Evaluation and Diagnosis of Chest Pain (Gulati et al., Circulation 2021;144:e368-e454) — associated/anginal-equivalent symptoms in women, diabetics, and older adults; atypical presentations (fall/syncope/delirium) in patients &gt;75.</span></div>
+      </div>
+    </section>
+    <section class="dx">
+      <h3><span class="dxno">2</span> 비ST분절상승 심근경색 <span class="dxen"></span>
+        <span class="dxcount">누락 3 · 보완 2</span>
+      </h3>
+      
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">주의할 함정</span>
+          <span class="idtag">2-1</span>
+        </div>
+        <div class="issue"><b>지적</b> ST하강/T파역전을 NSTEMI 단서로만 제시하고, STEMI-equivalent(재관류가 즉시 필요한 심전도)를 놓칠 위험을 언급하지 않음. 특히 V1–V3의 고립성 ST하강 + 높은 R파는 후벽 STEMI일 수 있어 후벽유도(V7–V9) 촬영이 필요하고, 광범위 ST하강 + aVR ST상승은 좌주간부/삼혈관 협착을 시사함. 이들은 NSTEMI 경로가 아니라 즉시 재관류 대상이라 must-not-miss 항목에서 load-bearing한 누락임.</div>
+        <div class="fix"><b>수정안</b> pitfalls/suspicionClues에 'ST하강/T파역전 중 STEMI-equivalent 감별(고립성 전흉부 ST하강→후벽유도로 후벽 STEMI 배제, aVR ST상승 동반 광범위 ST하강→좌주간부/다혈관), de Winter·Wellens 패턴 인지'를 추가. 해당 소견은 NSTEMI 위험도평가가 아니라 즉시 관상동맥조영 대상.</div>
+        <div class="src"><b>근거</b> 2023 ESC ACS, 2021 AHA/ACC/ASE chest pain · <span class="cite">2022 ACC Expert Consensus Decision Pathway on the Evaluation and Disposition of Acute Chest Pain in the ED (JACC 2022; PMID 36241466) — STEMI-equivalents incl. posterior STEMI/isolated anterior ST depression→posterior leads, de Winter; 2023 ESC Guidelines for the management of Acute Coronary Syndromes (Eur Heart J 2023).</span></div>
+      </div>
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">2-2</span>
+        </div>
+        <div class="issue"><b>지적</b> 위험도 도구(GRACE/HEART)만 언급하고, NSTE-ACS의 'very high-risk' 기준이 충족되면 위험점수와 무관하게 즉시(&lt;2h) 관상동맥조영이 필요하다는 관리상 게이트가 빠져 있음. suspicionClues에 혈역학 불안정/심부전/부정맥을 나열했지만 이를 즉시 침습 전략으로 연결하지 않음.</div>
+        <div class="fix"><b>수정안</b> '혈역학 불안정/심인성 쇼크, 약물 불응성 지속 흉통, 허혈성 급성 심부전, 생명위협 부정맥/심정지, 기계적 합병증, 반복적 동적 ST-T 변화(특히 간헐적 ST상승) 중 1개 이상 → 위험점수와 무관하게 즉시 침습 전략' 문구 추가. GRACE&gt;140 등 고위험은 조기(&lt;24h) 침습.</div>
+        <div class="src"><b>근거</b> 2023 ESC ACS · <span class="cite">2023 ESC Guidelines for the management of Acute Coronary Syndromes (Eur Heart J 2023) — very high-risk NSTE-ACS → immediate invasive strategy; high-risk (GRACE&gt;140) → early (&lt;24h) invasive.</span></div>
+      </div>
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">배제 접근</span>
+          <span class="idtag">2-3</span>
+        </div>
+        <div class="issue"><b>지적</b> serial hs-cTn rule-out 충족을 '배제에 가까움'으로 기술했으나, MI 배제가 불안정협심증/ACS 배제를 의미하지 않는다는 핵심 경고가 없음. 또한 0h 단일검체 rule-out은 흉통 발생 후 경과시간(통상 &gt;3h) 요건이 있음.</div>
+        <div class="fix"><b>수정안</b> 'hs-cTn rule-out은 MI를 배제할 뿐 불안정협심증/ACS를 배제하지 않으며 임상 위험도와 추적관찰이 필요; 초기 단일검체 rule-out은 증상 발생 후 충분한 경과시간을 전제'를 명시.</div>
+        <div class="src"><b>근거</b> 2021 AHA/ACC/ASE chest pain, 2023 ESC ACS · <span class="cite">2021 AHA/ACC/ASE/CHEST/SAEM/SCCT/SCMR Chest Pain Guideline (Circulation 2021) — MI rule-out ≠ ACS/UA exclusion; 2023 ESC ACS — 0h rule-out contingent on symptom onset &gt;3h.</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">2-4</span>
+        </div>
+        <div class="issue"><b>지적</b> 0/1h·0/2h와 0/3h를 동등하게 병기했으나, 현행 지침은 0/1h를 1차 권고(Class I), 0/2h를 대안(Class I)으로 우선하며 0/3h는 상대적으로 하향/차선임.</div>
+        <div class="fix"><b>수정안</b> '0/1h(우선) 또는 0/2h(대안) 권장, 0/3h는 차선책'으로 우선순위를 반영.</div>
+        <div class="src"><b>근거</b> 2023 ESC ACS · <span class="cite">2023 ESC Guidelines for the management of Acute Coronary Syndromes (Eur Heart J 2023) — 0h/1h best option, 0h/2h second-best (Class I); 0h/3h downgraded.</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">2-5</span>
+        </div>
+        <div class="issue"><b>지적</b> 주석에서 'HEART/EDACS는 conventional cTn 기반'이라 단정했으나, HEART pathway·EDACS-ADP는 hs-cTn을 사용한 변형/검증판이 존재함.</div>
+        <div class="fix"><b>수정안</b> 'HEART/EDACS는 원 개발 시 conventional/sensitive cTn 기반이나 hs-cTn 적용·검증판이 있음' 정도로 완화.</div>
+        <div class="src"><b>근거</b> 2021 AHA/ACC/ASE chest pain · <span class="cite">Safety/Effectiveness of the hs-cTn HEART Pathway (Circ Cardiovasc Qual Outcomes 2024) and derivation/validation of a hs-cTnT HEART Pathway (Am Heart J 2022, STOP-CP); modified EDACS-ADP with hs-cTn validation studies; consistent with 2021 AHA/ACC Chest Pain Guideline framing.</span></div>
+      </div>
+    </section>
+    <section class="dx">
+      <h3><span class="dxno">3</span> 불안정 협심증 / ACS <span class="dxen"></span>
+        <span class="dxcount">누락 3 · 보완 1</span>
+      </h3>
+      
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">3-1</span>
+        </div>
+        <div class="issue"><b>지적</b> 'hs-cTn serial'만 기재하고 표준 rapid protocol을 명시하지 않음. 2023 ESC ACS는 0/1시간(preferred) 또는 0/2시간 hs-cTn 알고리즘을 Class I으로 권고하며 이것이 rule-in/rule-out의 핵심 도구인데 빠져 있음. 또한 첫 12-lead ECG를 초기 진료 접촉 후 ≤10분 내 시행(Class I)하라는 시간 기준, 위험도 점수로 GRACE(침습 전략 시점 결정)를 구체적으로 명시하는 것이 load-bearing인데 '위험도 점수'로만 뭉뚱그림.</div>
+        <div class="fix"><b>수정안</b> '0/1h(우선) 또는 0/2h hs-cTn 알고리즘 적용, 첫 ECG ≤10분, GRACE 점수로 침습 전략 시점 결정'을 명시. 2021 AHA/ACC는 구조화된 clinical decision pathway(CDP) 사용을 권고.</div>
+        <div class="src"><b>근거</b> 2023 ESC ACS; 2021 AHA/ACC chest pain · <span class="cite">2023 ESC Guidelines for the Management of Acute Coronary Syndromes (Eur Heart J 2023; 0h/1h Class I, ECG ≤10 min Class I); 2021 AHA/ACC/ASE/CHEST/SAEM/SCCT/SCMR Chest Pain Guideline (CDP recommendation).</span></div>
+      </div>
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">고려 단서</span>
+          <span class="idtag">3-2</span>
+        </div>
+        <div class="issue"><b>지적</b> 'nitro 반응'을 양성 의심 단서로 제시했으나, 2021 AHA/ACC chest pain 가이드라인은 nitroglycerin에 대한 흉통 완화 반응을 ACS 진단 근거로 사용해서는 안 된다고 명시함(식도경련·기타 원인도 완화될 수 있어 비특이적). 오해를 유발할 수 있는 단서.</div>
+        <div class="fix"><b>수정안</b> 'nitro 반응은 ACS 진단/배제 근거로 사용하지 않음'으로 수정하거나 단서에서 제거. 대신 고령·당뇨·여성의 비전형 표현과 anginal equivalent(호흡곤란, 발한, 상복부 불편감)를 의심 단서로 추가.</div>
+        <div class="src"><b>근거</b> 2021 AHA/ACC chest pain · <span class="cite">2021 AHA/ACC/ASE/CHEST/SAEM/SCCT/SCMR Guideline for the Evaluation and Diagnosis of Chest Pain (Circulation 2021;144:e368) — nitroglycerin response should not be used as a diagnostic criterion.</span></div>
+      </div>
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">자동 게이트</span>
+          <span class="idtag">3-3</span>
+        </div>
+        <div class="issue"><b>지적</b> 항목명이 'Unstable angina / ACS'로 STEMI를 포함함에도 게이트/초기검사/pitfalls 어디에도 STEMI 인지 시 즉시 재관류(PCI/섬유소용해)라는 가장 시간-임계적 경로가 없음. STEMI 및 STEMI-equivalent(ST 하강+aVR 상승, 후벽 MI, Wellens, de Winter)는 serial troponin을 기다리지 않고 즉시 조치해야 하는 must-not-miss.</div>
+        <div class="fix"><b>수정안</b> 자동 게이트에 '첫 ECG에서 STEMI/STEMI-equivalent 시 troponin 대기 없이 즉시 재관류팀 활성화'를 추가하고, high-risk ECG 소견을 pitfalls/clues에 명시.</div>
+        <div class="src"><b>근거</b> 2023 ESC ACS · <span class="cite">2023 ESC Guidelines for the Management of Acute Coronary Syndromes (Eur Heart J 2023) — primary PCI ≤120 min from diagnosis; ST-depression ≥1mm in ≥8 leads with ST-elevation in aVR/V1 and de Winter pattern treated as acute-occlusion/STEMI-equivalent.</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">배제 접근</span>
+          <span class="idtag">3-4</span>
+        </div>
+        <div class="issue"><b>지적</b> 'serial hs-cTn 음성'을 배제 조건으로 제시하나, 단일/초기 hs-cTn만으로의 배제는 증상 발생 후 경과 시간에 의존함(발생 &lt;2-3시간이면 단일 저값으로 배제 불가, 재검 필요)이라는 시간 의존성이 드러나지 않음.</div>
+        <div class="fix"><b>수정안</b> '증상 발생 후 충분한 시간 경과 및 0/1h(또는 0/2h) 알고리즘상 rule-out 기준 충족 시 배제'로 시간 의존성을 명시.</div>
+        <div class="src"><b>근거</b> 2023 ESC ACS; 2021 AHA/ACC chest pain · <span class="cite">2023 ESC ACS Guideline (0h/1h and 0h/2h Class I; single value rule-out requires symptom onset ≥3 h / value below detection threshold); 2021 AHA/ACC Chest Pain Guideline (serial hs-cTn preferred, timing-dependent rule-out).</span></div>
+      </div>
+    </section>
+    <section class="dx">
+      <h3><span class="dxno">7</span> 자발성 관상동맥 박리 <span class="dxen"></span>
+        <span class="dxcount">누락 1 · 보완 2</span>
+      </h3>
+      
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">주의할 함정</span>
+          <span class="idtag">7-1</span>
+        </div>
+        <div class="issue"><b>지적</b> pitfalls에 SCAD에서 섬유소용해/혈전용해요법(thrombolysis/fibrinolysis)이 금기라는 안전 핵심 사항이 누락됨. SCAD가 STEMI로 발현하여 죽상혈전성 MI로 오인되어 혈전용해제를 투여하면 벽내혈종/박리가 확장되어 관상동맥 파열, 심장압전을 유발할 수 있음. 이는 mustNotMissGate(젊은 여성 STEMI)와 직결되는 load-bearing 포인트임.</div>
+        <div class="fix"><b>수정안</b> pitfalls에 '혈전용해/섬유소용해 요법은 벽내혈종·박리를 확장시켜 관상동맥 파열·심장압전을 초래할 수 있어 금기(특히 SCAD를 죽상혈전성 STEMI로 오인 시 위험)'를 추가할 것.</div>
+        <div class="src"><b>근거</b> 2018 AHA Scientific Statement on SCAD (Circulation 2018) · <span class="cite">2018 AHA Scientific Statement on SCAD (Hayes et al., Circulation 2018;137:e523–e557): thrombolysis not recommended/contraindicated due to IMH extension, coronary rupture, tamponade. Corroborated by 2018 ESC ACCA SCAD position paper (Eur Heart J 2018;39:3353) and case reports (thrombolysis-triggered dissection requiring CABG/transplant).</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">고려 단서</span>
+          <span class="idtag">7-2</span>
+        </div>
+        <div class="issue"><b>지적</b> 여성 우세가 매우 강함(약 90%)이라는 정도 표현과, FMD 외의 주요 소인질환(결합조직질환-Marfan/Loeys-Dietz/vascular EDS, 전신 염증성 질환, 다분만력) 언급이 빠져 있음.</div>
+        <div class="fix"><b>수정안</b> '환자의 약 90%가 여성'이라는 강한 성별 편향과 결합조직질환·전신염증성질환 등 소인질환을 임신/산후·FMD와 함께 추가하면 임상 단서가 더 견고해짐.</div>
+        <div class="src"><b>근거</b> 2018 AHA Scientific Statement on SCAD (Circulation 2018) · <span class="cite">2018 AHA Scientific Statement on SCAD (Circulation 2018;137:e523–e557): female predominance up to ~90%; associations with FMD, pregnancy/postpartum, and heritable connective tissue disorders.</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">7-3</span>
+        </div>
+        <div class="issue"><b>지적</b> 관상동맥조영이 진단의 기준검사이며, 진단 후 FMD 등 동반 동맥병변에 대해 두부-골반(head-to-pelvis) 1회 영상 스크리닝이 권고된다는 점을 '다른 동맥 병변 스크리닝 고려'보다 더 명시적으로 기술하면 좋음. 또한 intracoronary imaging(OCT/IVUS) 자체가 의인성 박리 확장 위험이 있어 신중히 시행해야 함을 명시할 것.</div>
+        <div class="fix"><b>수정안</b> 'coronary angiography가 진단 기준검사; 진단 후 FMD 선별 위한 두부-골반 1회 영상 권고; OCT/IVUS는 카테터에 의한 박리 확장 위험이 있어 신중 적용'으로 구체화.</div>
+        <div class="src"><b>근거</b> 2018 AHA Scientific Statement on SCAD (Circulation 2018); 2021 AHA/ACC Chest Pain Guideline · <span class="cite">2018 AHA Scientific Statement on SCAD (Circulation 2018;137:e523–e557): coronary angiography primary diagnostic tool, one-time head-to-pelvis screening for FMD/EVA, caution with intracoronary imaging due to iatrogenic dissection risk; 2021 AHA/ACC/ASE/... Chest Pain Guideline (Circulation 2021;144:e368) supports angiography as reference standard.</span></div>
+      </div>
+    </section>
+    <section class="dx">
+      <h3><span class="dxno">8</span> 급성 대동맥 박리 <span class="dxen"></span>
+        <span class="dxcount">누락 1 · 보완 2</span>
+      </h3>
+      
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">주의할 함정</span>
+          <span class="idtag">8-1</span>
+        </div>
+        <div class="issue"><b>지적</b> 통증 없는(painless) 또는 비전형 대동맥 박리를 놓치는 함정이 누락됨. IRAD/가이드라인상 약 5~10%는 흉통 없이 실신, 뇌졸중/국소 신경증상, 사지 허혈, 장간막·신장 malperfusion, 쇼크로만 발현할 수 있어 must-not-miss 도구에서 가장 위험한 누락 지점임.</div>
+        <div class="fix"><b>수정안</b> '통증이 없거나 비전형적으로(실신, 급성 뇌졸중, 사지/장기 malperfusion) 발현할 수 있으며, 통증이 없다고 배제해서는 안 됨'을 함정에 추가. 특히 뇌졸중 유사 발현 시 tPA/항혈전 투여 금기라는 점을 STEMI 함정과 함께 강조.</div>
+        <div class="src"><b>근거</b> 2022 ACC/AHA aortic disease guideline; IRAD registry · <span class="cite">2022 ACC/AHA Aortic Disease Guideline (Circulation 2022;146:e334, CIR.0000000000001106); IRAD painless-dissection data (Circulation registry analyses: painless AAD syncope 33.9%, neuro deficit 23.7%); IV thrombolysis contraindicated in AAD-related stroke (multiple case series/reviews).</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">고려 단서</span>
+          <span class="idtag">8-3</span>
+        </div>
+        <div class="issue"><b>지적</b> ADD-RS 고위험 소인 중 '흉부 대동맥 질환의 가족력'과 '알려진 대동맥판막 질환/최근 대동맥 조작(수술·카테터)' 항목이 누락됨. Marfan/대동맥류/HTN만 나열되어 결합조직질환 및 의인성 소인이 빠짐.</div>
+        <div class="fix"><b>수정안</b> 고위험 소인에 '대동맥 질환 가족력, 결합조직질환(Marfan/Loeys-Dietz/Ehlers-Danlos), 알려진 대동맥판막 질환, 최근 대동맥 조작(심도자/수술)'을 추가. 이동하는(migrating) 통증 양상도 고위험 통증 특징으로 포함 가능.</div>
+        <div class="src"><b>근거</b> 2022 ACC/AHA aortic disease guideline; ADD-RS (IRAD) · <span class="cite">2022 ACC/AHA Aortic Disease Guideline; ADD-RS high-risk conditions (IRAD-derived; MDCalc/guideline: Marfan, family history of aortic disease, known aortic valve disease, recent aortic manipulation, known TAA).</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">주의할 함정</span>
+          <span class="idtag">8-4</span>
+        </div>
+        <div class="issue"><b>지적</b> 정상 CXR(정상 종격동)와 정상 ECG/troponin이 박리를 배제하지 못한다는 함정이 없음. 종격동 확대는 상당수에서 관찰되지 않아 정상 CXR로 안심하는 오류가 흔함.</div>
+        <div class="fix"><b>수정안</b> '정상 CXR(종격동 정상)·정상 ECG·정상 troponin은 박리를 배제하지 못하며, 임상의심이 있으면 결정적 영상을 진행'을 함정에 추가.</div>
+        <div class="src"><b>근거</b> 2022 ACC/AHA aortic disease guideline · <span class="cite">2022 ACC/AHA Aortic Disease Guideline (limited CXR sensitivity; definitive diagnosis by CTA/MRI/TEE); ~12-20% of dissections have normal chest radiograph (IRAD; guideline diagnostic section).</span></div>
+      </div>
+    </section>
+    <section class="dx">
+      <h3><span class="dxno">9</span> 흉부 대동맥류 파열 또는 누출 <span class="dxen"></span>
+        <span class="dxcount">누락 2 · 보완 1</span>
+      </h3>
+      
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">9-1</span>
+        </div>
+        <div class="issue"><b>지적</b> 초기 검사에 즉각적 12유도 심전도와 고민감도 트로포닌이 빠져 있음. mimics로 ACS를 명시했음에도 심전도가 없다. 흉통 환자에서 심전도는 필수 초기 검사이며, 대동맥 병변이 관상동맥을 침범하거나 동반 허혈을 감별하는 데 필요하다.</div>
+        <div class="fix"><b>수정안</b> '즉시 12유도 심전도(가능하면 도착 후 10분 이내)와 고민감도 트로포닌'을 초기 검사에 추가. ACS 감별 및 동반 관상동맥/허혈 평가 목적임을 명시.</div>
+        <div class="src"><b>근거</b> 2021 AHA/ACC/ASE 흉통 평가 가이드라인 · <span class="cite">2021 AHA/ACC/ASE/CHEST/SAEM/SCCT/SCMR Guideline for the Evaluation and Diagnosis of Chest Pain (Circulation 2021): 12-lead ECG acquired/interpreted within 10 min of arrival (Class 1, LOE C-LD); troponin obtained without delay with high-sensitivity cTn preferred (Class 1, C-LD).</span></div>
+      </div>
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">9-2</span>
+        </div>
+        <div class="issue"><b>지적</b> 파열/누출은 곧 출혈성 쇼크 상황인데 초기 처치에 혈액형/교차시험(type &amp; crossmatch), 대량수혈 프로토콜 준비, 그리고 혈압/심박수 조절(anti-impulse) 항목이 빠져 있음. '혈역학 안정화'만으로는 출혈 대비와 임박파열 시 permissive hypotension 개념이 드러나지 않음.</div>
+        <div class="fix"><b>수정안</b> '혈액형·교차시험 및 대량수혈 준비, 응급 수혈, 임박파열/누출 시 혈압·심박수 조절(과도한 승압 회피, permissive hypotension 고려)'를 초기 처치에 추가.</div>
+        <div class="src"><b>근거</b> 2022 ACC/AHA 대동맥질환 가이드라인 · <span class="cite">2022 ACC/AHA Guideline for the Diagnosis and Management of Aortic Disease (Circulation/JACC 2022): for AAS treat to SBP &lt;120 mmHg (or lowest tolerated) and HR 60-80 bpm; IV beta-blockers first-line, non-DHP CCB if beta-blocker contraindicated; vasodilators added after rate control.</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">9-3</span>
+        </div>
+        <div class="issue"><b>지적</b> 대동맥 CTA만 언급되어 있으나 2022 가이드라인은 대동맥근부/상행 측정을 위해 심전도 게이팅 CTA를 권고하고, 급성 대동맥증후군 의심 시 IMH 감별을 위해 조영 전 비조영 영상을 먼저 획득할 것을 권장한다.</div>
+        <div class="fix"><b>수정안</b> '심전도 게이팅 CTA, 비조영+동맥기 조영 프로토콜(IMH 감별)'로 구체화.</div>
+        <div class="src"><b>근거</b> 2022 ACC/AHA 대동맥질환 가이드라인 · <span class="cite">2022 ACC/AHA Aortic Disease Guideline (2022): noncontrast series obtained first to distinguish IMH; ECG-gated CT/MRI recommended for measuring root and ascending aorta diameter (Class 1).</span></div>
+      </div>
+    </section>
+    <section class="dx">
+      <h3><span class="dxno">10</span> 심낭염 / 심낭삼출 / 심장압전 <span class="dxen"></span>
+        <span class="dxcount">누락 2 · 보완 2</span>
+      </h3>
+      
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">고려 단서</span>
+          <span class="idtag">10-1</span>
+        </div>
+        <div class="issue"><b>지적</b> 압전(tamponade)의 핵심 신체진찰 소견인 기이맥(pulsus paradoxus &gt;10 mmHg)이 누락되어 있다. 2007 체계적 문헌고찰 및 ESC 2015에서 기이맥은 압전 진단에 가장 중요한 진찰 소견으로 민감도 약 82%, 음성우도비 0.03으로 사실상 배제 지표다. 현재 clue는 저혈압/JVD만 언급.</div>
+        <div class="fix"><b>수정안</b> suspicionClues와 mustNotMissGate에 '기이맥(흡기 시 수축기혈압 &gt;10 mmHg 감소)'을 압전의 핵심 단서로 추가. 아울러 Beck 3징후(저혈압+JVD+심음 감약) 중 '심음 감약(muffled/distant heart sounds)'과 빈맥도 명시.</div>
+        <div class="src"><b>근거</b> 2015 ESC pericardial diseases; 2025 ESC myocarditis/pericarditis · <span class="cite">2015 ESC Guidelines for pericardial diseases (Eur Heart J 2015;36:2921-2964; PMC7539677) - tamponade clinical signs incl. pulsus paradoxus, Beck triad; Roy et al. JAMA 2007 (Rational Clinical Exam), sens 82%, LR- 0.03.</span></div>
+      </div>
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">주의할 함정</span>
+          <span class="idtag">10-5</span>
+        </div>
+        <div class="issue"><b>지적</b> 혈성 심낭삼출/압전의 must-not-miss 원인인 A형 대동맥박리(혈심낭)와 심근파열(급성심근경색 후)이 mimics/pitfalls에 없다. 또한 급성 심낭염·삼출 환자에서 항응고/NSAID 사용이 출혈성 압전 위험을 높이는 점도 누락. 감별을 놓치면 치명적.</div>
+        <div class="fix"><b>수정안</b> pitfalls에 'A형 대동맥박리·심근파열에 의한 혈심낭이 압전으로 발현 가능 → 삼출 발견 시 원인 감별 필수', 'effusion 동반 시 항응고/NSAID는 출혈성 압전 위험'을 추가. mimics에 대동맥박리 추가.</div>
+        <div class="src"><b>근거</b> 2022 ACC/AHA aortic disease; 2015 ESC pericardial diseases · <span class="cite">2015 ESC Guidelines for pericardial diseases (Eur Heart J 2015;36:2921-2964; PMC7539677) - tamponade from rupture of the heart/aortic dissection; oral anticoagulant a risk factor. 2022 ACC/AHA Aortic Disease Guideline (Circulation 2022) - type A dissection/tamponade.</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">고려 단서</span>
+          <span class="idtag">10-4</span>
+        </div>
+        <div class="issue"><b>지적</b> 대량 삼출/압전을 시사하는 ECG 소견인 저전압(low QRS voltage)과 전기교대(electrical alternans)가 언급되지 않았다. ESC 2015은 압전 소견으로 저전압·전기교대를 명시.</div>
+        <div class="fix"><b>수정안</b> ECG 단서에 '대량 삼출 시 저전압, 전기교대, 심장동요(swinging heart)' 추가.</div>
+        <div class="src"><b>근거</b> 2015 ESC pericardial diseases · <span class="cite">2015 ESC Guidelines for pericardial diseases (Eur Heart J 2015;36:2921-2964; PMC7539677) - 'ECG may show... especially low QRS voltages and electrical alternans... swinging heart.'</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">주의할 함정</span>
+          <span class="idtag">10-6</span>
+        </div>
+        <div class="issue"><b>지적</b> 2025 ESC는 hs-troponin 상승만으로는 심근심낭염(myopericarditis)으로 분류할 수 없고 CMR로 심근 침범을 확인해야 한다고 명시했으나, pitfall에는 'myopericarditis는 troponin 상승'만 기술되어 troponin 단독 판정 위험이 반영되지 않았다.</div>
+        <div class="fix"><b>수정안</b> 'troponin 상승만으로 myopericarditis 진단 불가 → 심근 침범은 CMR(갱신 Lake Louise 기준)로 확인' 문구 추가.</div>
+        <div class="src"><b>근거</b> 2025 ESC myocarditis/pericarditis (IMPS) · <span class="cite">2025 ESC Guidelines for management of myocarditis and pericarditis / IMPS (Eur Heart J 2025;46(40):3952) - hs-troponin alone insufficient; CMR with Lake Louise 2.0 required for myocardial involvement.</span></div>
+      </div>
+    </section>
+    <section class="dx">
+      <h3><span class="dxno">19</span> 폐색전증 <span class="dxen"></span>
+        <span class="dxcount">누락 2 · 보완 1</span>
+      </h3>
+      
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">19-2</span>
+        </div>
+        <div class="issue"><b>지적</b> D-dimer 임계값 전략이 단순 양/음성으로만 기술되고 age-adjusted cutoff가 누락됐다. 2019 ESC는 50세 초과 환자에서 연령보정 D-dimer(나이×10 µg/L) 사용을 권고(IIa B)하며, YEARS/PEGeD 같은 임상확률 보정 D-dimer 전략도 배제 효율을 높인다.</div>
+        <div class="fix"><b>수정안</b> '50세 초과에서는 연령보정 D-dimer(나이×10 µg/L) 적용, 또는 YEARS/adjusted-D-dimer 전략으로 배제 효율 향상' 추가.</div>
+        <div class="src"><b>근거</b> 2019 ESC acute pulmonary embolism · <span class="cite">2019 ESC acute pulmonary embolism guideline: age-adjusted D-dimer cut-off (age×10 µg/L, patients &gt;50 yr) — Class IIa B; YEARS/adapted D-dimer strategies endorsed (Recommendations for diagnosis, D-dimer section).</span></div>
+      </div>
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">19-3</span>
+        </div>
+        <div class="issue"><b>지적</b> 'high면 영상 우선'이 높은 임상확률(high pretest probability)과 혈역학적 불안정(고위험/high-risk PE)을 혼동시킬 수 있다. 2019 ESC는 혈역학적으로 불안정한 의심 고위험 PE는 별도 알고리즘으로, 즉시 CTPA(가용 시) 또는 침상 심초음파로 우심실 부전(RV dysfunction)을 확인하고 필요시 재관류를 고려하도록 한다. 이 응급 경로가 빠져 있다.</div>
+        <div class="fix"><b>수정안</b> '혈역학적 불안정(쇼크/저혈압) 의심 고위험 PE는 별도 경로: 즉시 CTPA 또는 침상 심초음파로 RV 부전 확인 → 재관류(혈전용해) 고려'를 명시.</div>
+        <div class="src"><b>근거</b> 2019 ESC acute pulmonary embolism · <span class="cite">2019 ESC acute pulmonary embolism guideline: dedicated diagnostic algorithm for suspected high-risk PE with haemodynamic instability (Figure 4 / diagnostic strategy section) — bedside echocardiography for RV dysfunction, immediate CTPA, reperfusion.</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">고려 단서</span>
+          <span class="idtag">19-4</span>
+        </div>
+        <div class="issue"><b>지적</b> 실신(syncope)과 저혈압/쇼크가 PE의 제시 증상으로 누락됐다. 2019 ESC는 실신을 PE의 흔치 않지만 중요한 초기 임상양상(특히 고위험 PE)으로 강조한다.</div>
+        <div class="fix"><b>수정안</b> 의심 단서에 '실신, 저혈압/쇼크' 추가.</div>
+        <div class="src"><b>근거</b> 2019 ESC acute pulmonary embolism · <span class="cite">2019 ESC acute pulmonary embolism guideline: clinical presentation includes syncope and haemodynamic instability (hypotension/shock); syncope, tachycardia, low systolic BP, respiratory insufficiency cited as predictors of unfavorable short-term prognosis (Clinical presentation section).</span></div>
+      </div>
+    </section>
+    <section class="dx">
+      <h3><span class="dxno">20</span> 긴장성 기흉 <span class="dxen"></span>
+        <span class="dxcount">누락 1 · 보완 1</span>
+      </h3>
+      
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">20-1</span>
+        </div>
+        <div class="issue"><b>지적</b> needle decompression을 언급하면서 감압 부위와 바늘 길이를 명시하지 않음. ATLS 10판(2018)은 성인에서 기존 2번째 늑간-쇄골중앙선 대신 5번째 늑간(4~5번째) 전액와선/중액와선을 1차 감압 부위로 변경했다. 2번째 늑간-쇄골중앙선은 흉벽 두께 때문에 표준 바늘이 흉막강에 도달하지 못해 실패율이 높다는 근거에 기반한 변경으로, 안전에 직결되는 핵심 포인트가 누락됨.</div>
+        <div class="fix"><b>수정안</b> 성인 needle decompression은 5번째 늑간(4~5th ICS) 전/중액와선을 우선 부위로 하고, 도달 실패를 줄이기 위해 최소 8cm(대형 성인)/5cm(소형 성인) 카테터를 사용한다는 점을 명시. 소아나 마른 환자에서는 2번째 늑간을 고려할 수 있음.</div>
+        <div class="src"><b>근거</b> ATLS 10th edition (2018) · <span class="cite">ATLS 10th edition (2018) — adult needle decompression site changed to 4th/5th ICS anterior to the anterior axillary line with a longer (~8 cm) large-bore catheter; corroborated by multiple secondary reviews (e.g., REBEL EM, Hospital Procedures Consultants).</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">고려 단서</span>
+          <span class="idtag">20-3</span>
+        </div>
+        <div class="issue"><b>지적</b> 편측 호흡음 감소는 있으나 타진 시 과공명(hyperresonance)이라는 고전적 신체 소견이 빠져 있음.</div>
+        <div class="fix"><b>수정안</b> 편측 타진 과공명(hyperresonance to percussion)을 청진 소견과 함께 추가.</div>
+        <div class="src"><b>근거</b> ATLS 10th edition (2018) · <span class="cite">ATLS 10th edition (2018) classic clinical signs of tension pneumothorax: hyperresonance to percussion, decreased/absent breath sounds, tracheal deviation and distended neck veins as late signs; corroborated by StatPearls/LITFL/Merck.</span></div>
+      </div>
+    </section>
+    <section class="dx">
+      <h3><span class="dxno">22</span> 외상성 기흉 / 혈흉 <span class="dxen"></span>
+        <span class="dxcount">누락 2 · 보완 2</span>
+      </h3>
+      
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">주의할 함정</span>
+          <span class="idtag">22-1</span>
+        </div>
+        <div class="issue"><b>지적</b> 긴장성 기흉의 응급 감압 처치가 '영상 전 처치'로만 되어 있고 구체적 술기와 위치가 빠져 있음. ATLS 10판은 성인 바늘 감압 위치를 기존 2nd ICS 중쇄골선에서 5th ICS 전액와선(가슴벽 두께가 얇아 성공률↑)으로 변경했고, 이어 확정적 흉관 삽입이 필요함을 강조함. 병원전/외상 상황에서는 finger thoracostomy도 대안으로 권고됨.</div>
+        <div class="fix"><b>수정안</b> 긴장성 기흉은 임상 진단(편측 호흡음 소실, 과공명, 경정맥 확장, 기관 편위, 저혈압)이며 영상 전 즉시 감압. 성인 바늘 감압은 5th ICS 전액와선(또는 대체로 2nd ICS 중쇄골선)에 충분한 길이(5-8cm) 바늘 사용 후 흉관 삽입으로 확정 처치한다는 점을 명시.</div>
+        <div class="src"><b>근거</b> ATLS 10th (2018) · <span class="cite">ATLS 10th edition (2018), Thoracic Trauma chapter — needle decompression at 5th ICS anterior to mid-axillary line (14–16G, ~8 cm), followed by definitive tube thoracostomy; tension pneumothorax is a clinical diagnosis.</span></div>
+      </div>
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">확진 접근</span>
+          <span class="idtag">22-2</span>
+        </div>
+        <div class="issue"><b>지적</b> 대량혈흉을 'ruleIn'과 'pitfalls'에서 언급하나 정량적 기준과 수술 적응증이 없음. ATLS는 대량혈흉을 초기 흉관 배액 &gt;1500 mL, 또는 &gt;200 mL/hr가 2-4시간 지속(또는 지속적 수혈 요구)으로 정의하며 이는 응급 개흉술(thoracotomy) 적응증임.</div>
+        <div class="fix"><b>수정안</b> 대량혈흉 = 초기 배액 &gt;1500 mL 또는 &gt;200 mL/hr가 2-4시간 지속 → 응급 개흉술 적응증. 대량혈흉은 흉관 삽입 시 급격한 혈역학 악화 가능하므로 혈액제제 준비 및 자가수혈(autotransfusion) 고려를 rule-in 로직에 포함.</div>
+        <div class="src"><b>근거</b> ATLS 10th (2018) · <span class="cite">ATLS 10th edition (2018), Thoracic Trauma chapter — massive hemothorax defined as &gt;1500 mL initial drainage or &gt;200 mL/hr for 2–4 hr; indication for urgent thoracotomy; autotransfusion considered.</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">고려 단서</span>
+          <span class="idtag">22-3</span>
+        </div>
+        <div class="issue"><b>지적</b> 긴장성 기흉의 고전적 임상 단서(기관 편위, 경정맥 확장, 과공명, 저혈압/빈맥)가 명시되지 않고 '편측 호흡음 감소, dullness'만 있어 긴장성 생리를 조기 인지하는 단서가 부족.</div>
+        <div class="fix"><b>수정안</b> 기흉(특히 긴장성)의 단서로 과공명(hyperresonance), 기관 편위, 경정맥 확장을 추가하여 dullness(혈흉)와 대비.</div>
+        <div class="src"><b>근거</b> ATLS 10th (2018) · <span class="cite">ATLS 10th edition (2018), Thoracic Trauma chapter — tension pneumothorax signs: hyperresonance, tracheal deviation, distended neck veins, hypotension/tachycardia.</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">배제 접근</span>
+          <span class="idtag">22-4</span>
+        </div>
+        <div class="issue"><b>지적</b> delayed PTX는 언급했으나, CT에서만 보이는 잠재성 기흉(occult pneumothorax)이 양압환기(전신마취/기계환기) 시 긴장성으로 진행할 위험이라는 임상적 요점이 빠짐.</div>
+        <div class="fix"><b>수정안</b> CT에서만 발견되는 occult pneumothorax는 양압환기 예정 환자에서 긴장성 진행 위험을 고려해 관찰 vs 흉관 삽입을 판단해야 한다는 점을 rule-out 단서에 추가.</div>
+        <div class="src"><b>근거</b> ATLS 10th (2018) · <span class="cite">ATLS 10th edition (2018) — tube thoracostomy before positive-pressure ventilation for traumatic pneumothorax; supported by EAST practice management guideline on occult pneumothorax in ventilated blunt-trauma patients (observation acceptable in stable patients with serial monitoring).</span></div>
+      </div>
+    </section>
+    <section class="dx">
+      <h3><span class="dxno">34</span> 식도파열 <span class="dxen"></span>
+        <span class="dxcount">누락 1 · 보완 1</span>
+      </h3>
+      
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">주의할 함정</span>
+          <span class="idtag">34-1</span>
+        </div>
+        <div class="issue"><b>지적</b> '지연 시 사망률 증가'로 방향만 언급하고, 예후를 좌우하는 핵심 교육 포인트인 24시간 이내 진단·수술적 일차봉합의 결정적 중요성을 명시하지 않음. 24시간 이내 일차봉합 시 생존율 약 90%, 그 이후 급격히 악화되는 시간 의존성이 이 진단의 must-not-miss 근거임.</div>
+        <div class="fix"><b>수정안</b> '증상 발생 24시간 이내 진단 및 수술(일차봉합+종격동/흉강 배액)이 생존율을 좌우하는 최대 예후인자(24h 이내 ~90% 생존, 지연 시 급격히 저하)'를 명시할 것.</div>
+        <div class="src"><b>근거</b> Surgical consensus / WSES esophageal perforation, StatPearls Boerhaave 2023 · <span class="cite">StatPearls, Boerhaave Syndrome (NBK430808, 2023/current): 12-24h treatment survival approaching 75%, untreated mortality &gt;90%; corroborated by Ann Thorac Surg 1999 and EJCTS 2004 primary-repair series</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">고려 단서</span>
+          <span class="idtag">34-3</span>
+        </div>
+        <div class="issue"><b>지적</b> 고전적 Mackler 3징(구토·흉통·피하기종)은 반영되어 있으나, 진단적 가치가 큰 좌측 우세 흉수 및 흉수 천자 소견(아밀라아제 상승, pH 저하, 음식물/타액 성분)이 clue로 빠져 있음.</div>
+        <div class="fix"><b>수정안</b> '좌측 우세 흉수, 흉수 아밀라아제 상승·낮은 pH(식도 내용물 유출 시사)'를 의심 단서에 추가.</div>
+        <div class="src"><b>근거</b> StatPearls Boerhaave / diagnostic consensus · <span class="cite">StatPearls Boerhaave Syndrome (NBK430808): left pleural cavity predominance; pleural fluid pH &lt;6, elevated salivary amylase, food particles/gastric fluid</span></div>
+      </div>
+    </section>
+    <section class="dx">
+      <h3><span class="dxno">40</span> 담관염 <span class="dxen"></span>
+        <span class="dxcount">누락 2 · 보완 0</span>
+      </h3>
+      
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">주의할 함정</span>
+          <span class="idtag">40-1</span>
+        </div>
+        <div class="issue"><b>지적</b> 가장 중요한 함정인 Charcot triad의 낮은 민감도가 빠져 있음. TG18은 완전한 3징후(발열·황달·RUQ통증)가 소수의 환자(연구에 따라 약 20~70%, 다수 &lt;50%)에서만 관찰되기 때문에 3징후 부재로 담관염을 배제하면 안 된다고 강조함. 특히 고령/면역저하 환자는 발열이나 황달 없이 저혈압·의식저하만으로 발현될 수 있어 mustNotMissGate를 'Charcot triad/쇼크'에만 걸면 비전형 발현을 놓칠 위험이 있음.</div>
+        <div class="fix"><b>수정안</b> Charcot triad 민감도가 낮아 3징후가 모두 없어도 담관염을 배제하지 말 것, 고령/면역저하 환자는 발열·황달 없이 hypotension/AMS만으로 발현될 수 있음을 명시. 게이트를 담즙정체 소견 + 전신염증/패혈증 징후로 확장 권고.</div>
+        <div class="src"><b>근거</b> Tokyo Guidelines 2018 (TG18, Kiriyama et al., J Hepatobiliary Pancreat Sci 2018) · <span class="cite">Tokyo Guidelines 2018 (TG18), Kiriyama et al., J Hepatobiliary Pancreat Sci 2018;25:17-30 — diagnostic criteria (A+B+C) and note on low sensitivity of Charcot triad.</span></div>
+      </div>
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">40-2</span>
+        </div>
+        <div class="issue"><b>지적</b> TG18 중증도 등급(Grade I/II/III)이 관리·배액 시점을 결정하는 핵심 축인데 'urgent biliary drainage if severe'만 있고 severity 정의가 없음. Grade III(중증)는 최소 1개 이상의 신규 장기부전(심혈관: dopamine ≥5 μg/kg/min 또는 any dose norepinephrine, 신경계 의식저하, 호흡/신/간/혈액계 등)으로 정의되며 혈역학 안정화 직후 응급 담도배액이 사망률을 결정함.</div>
+        <div class="fix"><b>수정안</b> TG18 Grade I/II/III 중증도 등급을 명시하고, Grade III=신규 장기부전(구체적 기준 포함), 처치는 혈역학 안정화 후 응급/조기 내시경적(ERCP) 담도배액이 결정적임을 추가. Grade II도 조기 배액 대상임을 명시.</div>
+        <div class="src"><b>근거</b> Tokyo Guidelines 2018 (TG18) severity grading &amp; flowchart (Mukai/Kiriyama, J Hepatobiliary Pancreat Sci 2018) · <span class="cite">Tokyo Guidelines 2018 (TG18), Kiriyama et al., J Hepatobiliary Pancreat Sci 2018;25:17-30 — severity grading (Grade I/II/III) and organ-dysfunction criteria; TG18 management flowchart (Mukai et al.).</span></div>
+      </div>
+    </section>
+    <section class="dx">
+      <h3><span class="dxno">59</span> 급성 대동맥 증후군: 벽내혈종/관통성 궤양 <span class="dxen"></span>
+        <span class="dxcount">누락 4 · 보완 0</span>
+      </h3>
+      
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">고려 단서</span>
+          <span class="idtag">59-1</span>
+        </div>
+        <div class="issue"><b>지적</b> ADD-RS(Aortic Dissection Detection Risk Score)의 구조화된 고위험 3범주가 빠져 있음. 위험 인자를 나열만 했을 뿐, 진료지침이 권고하는 위험 계층화 도구를 언급하지 않음. IMH/PAU도 동일 AAS 경로로 평가해야 함.</div>
+        <div class="fix"><b>수정안</b> 고위험 병력(Marfan 등 결합조직질환, 대동맥질환 가족력, 기존 대동맥판막질환/흉부대동맥류, 최근 대동맥 조작), 고위험 통증(갑작스럽·찢어지는 양상·최고강도), 고위험 진찰(맥박 결손, 양팔 수축기혈압차, 통증 동반 국소 신경학적 결손, 저혈압/쇼크, 새 대동맥판 역류잡음)의 3범주 ADD-RS를 명시; ADD-RS&gt;1이면 곧바로 CTA 진행.</div>
+        <div class="src"><b>근거</b> 2021 AHA/ACC/ASE chest pain; 2022 ACC/AHA aortic · <span class="cite">2021 AHA/ACC/ASE/... Chest Pain Guideline (Circulation 2021;144:e368) and 2022 ACC/AHA Aortic Disease Guideline (Circulation 2022;146:e334 / JACC 2022;80:e223) — ADD-RS categories and score&gt;1 -&gt; definitive imaging.</span></div>
+      </div>
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">59-2</span>
+        </div>
+        <div class="issue"><b>지적</b> 영상 프로토콜의 핵심 세부가 빠짐: ECG-gated로 흉부~골반 전(全)대동맥을 촬영해야 하고, IMH는 조영증강 전 비조영 단계에서 가장 잘 보이므로 비조영+조영 프로토콜이 필요하며, 침상 TTE로 심낭삼출/탐포네이드·대동맥판역류·근위 상행 침범을 즉시 평가하는 것이 권고됨.</div>
+        <div class="fix"><b>수정안</b> 'ECG-gated CTA(비조영+조영, 흉부~골반 전대동맥). 신속한 침상 TTE로 심낭삼출/탐포네이드·AR·근위부 평가 병행. CTA 금기 시 TEE/MRA 대안' 형태로 보강.</div>
+        <div class="src"><b>근거</b> 2022 ACC/AHA aortic · <span class="cite">2022 ACC/AHA Aortic Disease Guideline (Circulation 2022;146:e334) — CT technique (thoracic inlet to femoral arteries, ECG-gated for root/ascending) and role of TTE/echocardiography in acute aortic syndrome.</span></div>
+      </div>
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">확진 접근</span>
+          <span class="idtag">59-3</span>
+        </div>
+        <div class="issue"><b>지적</b> 수술 긴급도를 결정하는 고위험 영상 소견이 'depth'로만 모호하게 언급됨. 상행(Type A) 침범 여부와 정량적 고위험 지표가 rule-in의 핵심인데 누락.</div>
+        <div class="fix"><b>수정안</b> 상행 대동맥 침범(=Type A, 응급 수술 대상), 최대 대동맥 직경 ≥50 mm, 혈종 두께 ≥11 mm, ulcer-like projection 깊이 &gt;10 mm, 심낭/흉막 삼출 등 고위험 소견을 명시해 위치(A/B)와 합병증 위험을 함께 기술.</div>
+        <div class="src"><b>근거</b> 2022 ACC/AHA aortic · <span class="cite">2022 ACC/AHA Aortic Disease Guideline (Circulation 2022;146:e334) — Type A IMH prompt surgical repair; type B IMH high-risk features (max diameter ≥50 mm, wall thickness &gt;11 mm, ULP, effusion); PAU high-risk depth &gt;10 mm from cited IMH/PAU imaging literature.</span></div>
+      </div>
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">주의할 함정</span>
+          <span class="idtag">59-4</span>
+        </div>
+        <div class="issue"><b>지적</b> IMH/PAU가 박리·파열·대동맥 파열로 진행할 수 있다는 시간의존적 특성과, 초기 영상이 음성/모호해도 고의심 시 재영상·추적이 필요하다는 점이 빠짐. 'D-dimer 의존 금지'는 옳으나(IMH는 D-dimer 상승이 낮아 위음성 가능) 진행성 위험 경고가 없음.</div>
+        <div class="fix"><b>수정안</b> 'IMH/PAU는 박리·파열로 급속 진행 가능; 초기 CT가 음성/경미해도 임상 고의심이면 재영상 또는 추적영상 시행. 상행 침범은 응급 수술 대상' 취지를 추가.</div>
+        <div class="src"><b>근거</b> 2022 ACC/AHA aortic · <span class="cite">2022 ACC/AHA Aortic Disease Guideline (Circulation 2022;146:e334) — IMH/PAU progression to dissection/rupture, follow-up CT surveillance, urgent repair for ascending involvement/complications; 2021 Chest Pain Guideline on repeat imaging when suspicion persists.</span></div>
+      </div>
+    </section>
+    <section class="dx">
+      <h3><span class="dxno">63</span> 심장압전 독립 게이트 <span class="dxen"></span>
+        <span class="dxcount">누락 2 · 보완 2</span>
+      </h3>
+      
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">주의할 함정</span>
+          <span class="idtag">63-1</span>
+        </div>
+        <div class="issue"><b>지적</b> 심장압전의 원인으로 A형 대동맥박리(및 심근 파열)를 별도로 언급하지 않고, 이 경우 단독 pericardiocentesis가 위험하다는 점(감압으로 인한 재출혈·박리 진행 촉진, 출혈성 심낭혈종에서 바늘배액 효과 제한)을 놓치고 있음. tamponade 발견 시 원인 감별이 배액 방식(응급 수술 vs pericardiocentesis)을 좌우함.</div>
+        <div class="fix"><b>수정안</b> A형 대동맥박리에 동반된 tamponade는 원칙적으로 응급 수술이 우선이며 단독 pericardiocentesis는 피해야 함(혈역학 붕괴 직전 극단적 상황에서만 소량의 조절 배액을 bridge로 고려). 외상성/의인성 출혈성 tamponade도 수술적 배액이 필요할 수 있으므로 원인 감별을 pitfall에 명시할 것.</div>
+        <div class="src"><b>근거</b> 2022 ACC/AHA aortic disease; 2015 ESC pericardial diseases · <span class="cite">2015 ESC Guidelines for the Diagnosis and Management of Pericardial Diseases (Eur Heart J 2015;36:2921) — aortic dissection a contraindication to pericardiocentesis, urgent surgery indicated; 2022 ACC/AHA Guideline for the Diagnosis and Management of Aortic Disease (Circulation 2022;146:e334) — controlled pericardial drainage of just enough fluid as bridge to repair.</span></div>
+      </div>
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">고려 단서</span>
+          <span class="idtag">63-2</span>
+        </div>
+        <div class="issue"><b>지적</b> pulsus paradoxus를 clue로 넣었으나, 위음성/위양성 상황이 명시되지 않음. 우심계 압전(post-op regional tamponade), 양압환기, 중증 대동맥판폐쇄부전, 심방중격결손, 심한 좌심실기능부전에서는 pulsus paradoxus가 없을 수 있고, 반대로 중증 천식/COPD·저혈량에서 위양성이 나타남.</div>
+        <div class="fix"><b>수정안</b> pulsus paradoxus는 민감하지만 특이적이지 않으며 결손 시에도 압전을 배제할 수 없음을 명시. 특히 심장수술 후 국소(regional) tamponade와 양압환기 환자에서 고전적 소견이 결여될 수 있음을 pitfall/clue에 추가.</div>
+        <div class="src"><b>근거</b> 2015 ESC pericardial diseases · <span class="cite">2015 ESC Guidelines for the Diagnosis and Management of Pericardial Diseases (Eur Heart J 2015;36:2921) — pulsus paradoxus absent in ASD, significant aortic regurgitation, and regional tamponade, and falsely normal under mechanical ventilation; classic physiology for false-positive in severe COPD/asthma and hypovolemia.</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">고려 단서</span>
+          <span class="idtag">63-3</span>
+        </div>
+        <div class="issue"><b>지적</b> ECG 소견으로 전기적 교대(electrical alternans)만 기재하고, 대량 삼출에서 흔한 저전압(low QRS voltage)을 누락함.</div>
+        <div class="fix"><b>수정안</b> 저전압 QRS와 동성빈맥을 electrical alternans와 함께 ECG clue로 추가.</div>
+        <div class="src"><b>근거</b> 2015 ESC pericardial diseases · <span class="cite">2015 ESC Guidelines for the Diagnosis and Management of Pericardial Diseases (Eur Heart J 2015;36:2921) — ECG may show low QRS voltages and electrical alternans.</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">확진 접근</span>
+          <span class="idtag">63-4</span>
+        </div>
+        <div class="issue"><b>지적</b> 'RA/RV diastolic collapse'로 묶어 표현했으나, 우방 허탈은 late diastole/early systole(수축기), 우실 허탈은 early diastole에 발생하며 우실 확장기 허탈이 더 특이적, 우방 허탈이 더 민감하다는 시기·의미 구분이 흐려짐.</div>
+        <div class="fix"><b>수정안</b> 우방(수축기) 허탈은 민감도가, 우실(확장기) 허탈은 특이도가 높다는 점과, tamponade는 본질적으로 임상 진단이며 echo 소견은 이를 뒷받침한다는 점을 명확히 할 것.</div>
+        <div class="src"><b>근거</b> 2015 ESC pericardial diseases · <span class="cite">2015 ESC Guidelines for the Diagnosis and Management of Pericardial Diseases (Eur Heart J 2015;36:2921) — early diastolic RV collapse and late diastolic RA collapse listed as echo tamponade signs; tamponade characterized as a clinical diagnosis with echo confirmation of hemodynamic impact.</span></div>
+      </div>
+    </section>
+    <section class="dx">
+      <h3><span class="dxno">69</span> 겸상적혈구 급성흉부증후군 <span class="dxen"></span>
+        <span class="dxcount">누락 2 · 보완 0</span>
+      </h3>
+      
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">고려 단서</span>
+          <span class="idtag">69-2</span>
+        </div>
+        <div class="issue"><b>지적</b> ACS가 통증위기(vaso-occlusive crisis)로 입원한 후 24~72시간 내 새로 발생하는 흔한 임상 패턴이 빠져 있음. 입원 중 발생 및 지속 모니터링 필요성이 load-bearing 포인트인데 누락. 또한 과수액·아편유사제 과다투여에 의한 저환기가 ACS를 유발/악화시키는 유발인자로 언급되지 않음.</div>
+        <div class="fix"><b>수정안</b> 단서에 &quot;통증위기 입원 후 24~72시간에 흔히 발생 → 입원 전 기간 vigilance 필요&quot; 추가. 유발인자로 opioid 유발 저환기, 과수액, incentive spirometry 미시행을 pitfalls에 반영.</div>
+        <div class="src"><b>근거</b> BSH 2015; NHLBI Expert Panel Report 2014 · <span class="cite">BSH 2015 (Howard et al., Br J Haematol 2015; doi:10.1111/bjh.13348) and NHLBI Evidence-Based Management of SCD, Expert Panel Report 2014 — ACS commonly arises 24-72h into VOC admission; incentive spirometry prevents ACS; opioid-induced hypoventilation and fluid overload are recognised precipitants.</span></div>
+      </div>
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">69-3</span>
+        </div>
+        <div class="issue"><b>지적</b> 진단 검사는 적절하나, red-flag(must-not-miss) 항목으로서 즉시 시행해야 할 핵심 처치(경험적 항생제 = 세팔로스포린 + 매크롤라이드[비정형 커버], 저산소/중증 시 단순 또는 교환수혈, 산소, incentive spirometry)가 전혀 언급되지 않음. 진단 지원 도구라도 치명적 진단의 즉시 조치를 병기하는 것이 안전상 필요.</div>
+        <div class="fix"><b>수정안</b> 경험적 항생제(IV 세팔로스포린 + 매크롤라이드), 저산소증 시 수혈(단순/교환), 산소·통증조절·incentive spirometry를 즉시 조치로 추가. 혈액배양·ABG도 초기검사에 포함 권장.</div>
+        <div class="src"><b>근거</b> NHLBI Expert Panel Report 2014; BSH 2015; ASH 2020 SCD guidelines · <span class="cite">BSH 2015 (Howard et al., Br J Haematol 2015; doi:10.1111/bjh.13348) — empiric antibiotics incl. macrolide/atypical cover, incentive spirometry, transfusion (simple vs exchange by severity/hypoxia), blood cultures/sputum in workup; NHLBI Expert Panel Report 2014 and ASH 2020 Transfusion Support guideline corroborate transfusion thresholds and oxygen/supportive care.</span></div>
+      </div>
+    </section>
+    <section class="dx">
+      <h3><span class="dxno">72</span> 종격동염 <span class="dxen"></span>
+        <span class="dxcount">누락 4 · 보완 0</span>
+      </h3>
+      
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">72-1</span>
+        </div>
+        <div class="issue"><b>지적</b> 식도파열이 원인으로 의심될 때 조영 식도조영술(수용성 조영제/CT esophagography, oral contrast)이 진단 확진 검사인데 목록에 빠져 있음. 조영증강 CT만으로는 미세 천공을 놓칠 수 있고, 경구 조영제 병용 CT/식도조영이 천공 위치·길이(수술 접근 결정)를 확인함.</div>
+        <div class="fix"><b>수정안</b> CT 프로토콜에 경구 수용성 조영제(CT esophagography) 또는 별도 조영 식도조영술을 추가. DNM 의심 시 촬영 범위를 두개저(skull base)~횡격막 돔까지 확장.</div>
+        <div class="src"><b>근거</b> RadioGraphics 2021 CT esophagography; ESGE/consensus esophageal perforation · <span class="cite">WSES esophageal perforation guidance (CT with oral+IV contrast, modality of choice, sens 92–100%); AJR 2020 'Diagnostic Utility of CT and Fluoroscopic Esophagography for Suspected Esophageal Perforation in the ED' (CT esophagography sens 100%); anatomy of the retropharyngeal/danger space skull base→diaphragm (DNM literature).</span></div>
+      </div>
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">72-2</span>
+        </div>
+        <div class="issue"><b>지적</b> 'broad antibiotics'만 기재. 식도파열·치성/경부 기원(DNM)에서는 혐기균 커버가 필수이며, 식도천공 시 Candida 등 진균 커버(항진균제) 추가가 권고됨. 경험적 항생제 세부가 없음.</div>
+        <div class="fix"><b>수정안</b> 광범위 항생제에 혐기균 커버 명시, 식도천공 의심 시 경험적 항진균제(예: 에키노칸딘/플루코나졸) 추가를 병기.</div>
+        <div class="src"><b>근거</b> Consensus esophageal perforation management; descending necrotizing mediastinitis literature · <span class="cite">WSES esophageal perforation (cover Gram+/Gram−/anaerobes/Pseudomonas); DNM surgical series (cephalosporin + metronidazole for anaerobes); esophageal-perforation antifungal literature (empiric fluconazole/caspofungin for esophageal perforation as a Candida risk factor).</span></div>
+      </div>
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">배제 접근</span>
+          <span class="idtag">72-3</span>
+        </div>
+        <div class="issue"><b>지적</b> '고품질 CT에서 소견 없음'을 배제 기준으로 제시했으나, 초기/미세 식도천공은 단순 조영 CT에서 위음성 가능. 조영 식도조영 없이 CT 음성만으로 식도파열을 배제하면 안 됨.</div>
+        <div class="fix"><b>수정안</b> 식도파열 의심이 지속되면 CT 음성이라도 조영 식도조영술(수용성→필요시 반복/CT esophagography)로 재확인 후 배제. 임상 악화 시 재영상 권고.</div>
+        <div class="src"><b>근거</b> RadioGraphics 2021 CT esophagography; Boerhaave CT-esophagography (Radiology 2013) · <span class="cite">AJR 2020 CT vs fluoroscopic esophagography in ED (CT esophagography NPV ~100%, fluoroscopy sens 77.8%); WSES esophageal perforation (re-evaluate/repeat imaging on clinical deterioration).</span></div>
+      </div>
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">주의할 함정</span>
+          <span class="idtag">72-4</span>
+        </div>
+        <div class="issue"><b>지적</b> '지연 진단 위험'은 언급했으나 시간-임계성의 정량적 근거와 조기 외과적 감염원 제어(source control)의 결정적 역할이 빠짐. 24시간 내 인지·수술 시 사망률 약 절반 감소.</div>
+        <div class="fix"><b>수정안</b> 조기 인지 및 24시간 내 외과적 감염원 제어(배액/변연절제/일차봉합)가 생존의 핵심임을 명시. DNM은 초기 영상에서 과소평가되기 쉬워 낮은 역치의 재영상 필요도 추가.</div>
+        <div class="src"><b>근거</b> Esophageal perforation outcome data (&lt;24h ~50% mortality reduction); DNM consensus · <span class="cite">'Esophageal perforation: diagnostic work-up and clinical decision-making in the first 24 hours' (PMC3219576) and StatPearls/management reviews (&lt;24 h mortality 10–25% vs &gt;48 h 40–60%, delay &gt;24 h doubles mortality, early primary repair + wide drainage); DNM surgical series (early drainage/debridement).</span></div>
+      </div>
+    </section>
+    <section class="dx">
+      <h3><span class="dxno">73</span> 천공성 소화성 궤양 <span class="dxen"></span>
+        <span class="dxcount">누락 2 · 보완 1</span>
+      </h3>
+      
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">73-1</span>
+        </div>
+        <div class="issue"><b>지적</b> 흉통 감별 도구이고 pitfalls/mimics에 하벽 MI(ACS)를 명시했음에도 초기검사에 ECG(및 트로포닌)가 빠져 있다. 상복부 통증으로 내원한 하벽 MI를 천공으로 오인하거나 그 반대의 오류를 막으려면 도착 즉시 ECG가 필요하다.</div>
+        <div class="fix"><b>수정안</b> 초기검사에 '내원 10분 이내 12-lead ECG ± 고감도 트로포닌'을 추가하여 하벽 MI를 능동적으로 배제하도록 한다.</div>
+        <div class="src"><b>근거</b> 2021 AHA/ACC/ASE Chest Pain Guideline · <span class="cite">2021 AHA/ACC/ASE/CHEST/SAEM/SCCT/SCMR Guideline for the Evaluation and Diagnosis of Chest Pain (Circulation 2021;144:e368) — 12-lead ECG within 10 min of arrival, Class 1, LOE C-LD.</span></div>
+      </div>
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">73-2</span>
+        </div>
+        <div class="issue"><b>지적</b> upright CXR/복부 X-ray의 유리가스 검출 민감도는 약 50-80%에 불과해 천공의 약 10-30%에서 횡격막하 free air가 보이지 않는다. 텍스트는 X-ray 음성이 배제가 아님을 명시하지 않는다. 또한 초기 CT가 음성이어도 최대 12%에서 정상으로 나올 수 있어 수용성 조영제(경구/NG) 삼중조영 CT가 권고된다.</div>
+        <div class="fix"><b>수정안</b> 'X-ray 음성은 천공을 배제하지 못하며 CT가 1차 영상'임을 명시하고, 임상 의심이 높은데 CT가 음성이면 수용성 조영제 경구/NG 삼중조영 CT 재평가를 추가한다.</div>
+        <div class="src"><b>근거</b> WSES Perforated Peptic Ulcer Guidelines 2020 · <span class="cite">WSES Perforated and bleeding peptic ulcer guidelines 2020 (Tarasconi et al., World J Emerg Surg 2020;15:3), Diagnosis section: free air 30–85%; negative X-ray does not rule out; recommend CT (1C); if free air not seen add water-soluble oral/NG contrast (2D); 'up to 12%... normal CT scan... triple contrast CT.'</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">73-4</span>
+        </div>
+        <div class="issue"><b>지적</b> 천공성 궤양은 복막염/패혈증을 동반하는 외과적 응급이나 초기 처치에 항생제만 있고 조기 수액소생과 조기 source control(수술) 시간 개념이 명시되지 않았다.</div>
+        <div class="fix"><b>수정안</b> 항생제 1시간 이내 투여와 함께 조기 수액소생·젖산 재측정, 확진 시 지체 없는 수술적 source control을 초기 번들에 명시한다.</div>
+        <div class="src"><b>근거</b> Surviving Sepsis Campaign 2021 / WSES 2020 · <span class="cite">WSES Perforated peptic ulcer guidelines 2020 (Tarasconi et al., World J Emerg Surg 2020;15:3), Resuscitation section (rapid resuscitation, MAP&gt;=65/UO&gt;=0.5/lactate normalization, 1C; 'ideally within 1 h'; refers to Surviving Sepsis Campaign); Surviving Sepsis Campaign 2021 (antibiotics within 1 h for septic shock).</span></div>
+      </div>
+    </section>
+    <section class="dx">
+      <h3><span class="dxno">88</span> 외상성 대혈관 손상 <span class="dxen"></span>
+        <span class="dxcount">누락 1 · 보완 2</span>
+      </h3>
+      
+      <div class="item gap">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge gap">누락</span>
+          <span class="field">먼저 확인할 검사·평가</span>
+          <span class="idtag">88-1</span>
+        </div>
+        <div class="issue"><b>지적</b> 진단이 확인되었거나 강하게 의심되는 안정 환자에서 확정적 수술/TEVAR 전 파열 예방을 위한 anti-impulse therapy(에스몰롤 등으로 심박수·수축기혈압 조절, 흔히 SBP&lt;100-120mmHg·HR&lt;80 목표)가 전혀 언급되지 않음. 이는 진단 확정과 근치적 치료 사이의 안전 필수 교량 처치임. 단 동반 외상성 뇌손상(TBI)이 있는 Grade 1-2에서는 anti-impulse보다 뇌관류 위한 혈압 유지를 우선한다는 단서도 함께 필요.</div>
+        <div class="fix"><b>수정안</b> CTA에서 대동맥 손상 확인 시 즉각적 혈압/심박수(anti-impulse) 조절을 시작하고, 혈역학적으로 안정된 Grade 3는 동반손상 관리를 위해 지연 TEVAR(&gt;24h)을 고려한다는 관리 원칙을 추가. TBI 동반 시 anti-impulse는 권고되지 않고 혈압관리 우선.</div>
+        <div class="src"><b>근거</b> SVS BTAI CPG 2026 focused update (원 2011) · <span class="cite">SVS Clinical Practice Guideline on Management of Blunt Thoracic Aortic Injury: Focused Update, J Vasc Surg 2026 (S0741-5214(26)00110-2); corroborated by SVS press release (vascular.org, Mar 2026) and Guideline Central 2026 BTAI spotlight.</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">확진 접근</span>
+          <span class="idtag">88-2</span>
+        </div>
+        <div class="issue"><b>지적</b> CTA 소견을 나열했으나 SVS 손상 등급 체계(Grade I 내막파열, II 벽내혈종, III 가성동맥류, IV 파열/횡단)를 명시하지 않고, 특히 Grade II 벽내혈종(intramural hematoma)이 목록에서 빠져 있음. 등급이 치료 방침(Grade 1-2 비수술적 관리 vs Grade 3-4 수복)을 결정하므로 rule-in 서술의 임상적 중요성이 큼.</div>
+        <div class="fix"><b>수정안</b> rule-in 소견을 SVS Grade I-IV로 구조화하고 intramural hematoma(Grade II)를 포함. 등급이 관리(경미 손상은 definitive 비수술적 관리)를 좌우함을 명시.</div>
+        <div class="src"><b>근거</b> SVS BTAI CPG 2026 focused update · <span class="cite">SVS BTAI CPG Focused Update, J Vasc Surg 2026 (four-grade system I-IV; NOM recommended for Grades 1-2, delayed TEVAR for stable Grade 3, emergent repair Grade 4); original grading Azizzadeh/Lee SVS 2011.</span></div>
+      </div>
+      <div class="item minor">
+        <div class="item-head">
+          <input type="checkbox" class="chk" aria-label="반영 대상 체크">
+          <span class="badge minor">보완</span>
+          <span class="field">고려 단서</span>
+          <span class="idtag">88-3</span>
+        </div>
+        <div class="issue"><b>지적</b> CXR 단서로 'widened mediastinum'만 제시했으나 종격동 확장은 민감도·특이도가 제한적이며, 대동맥손잡이(aortic knob) 윤곽 소실, 좌측 apical cap, 좌 주기관지 하강, NG tube 우측 편위, 좌측 혈흉, 1-2번 늑골/견갑골 골절 등 다른 CXR 단서가 함께 강조되어야 함.</div>
+        <div class="fix"><b>수정안</b> widened mediastinum 외의 CXR 이차 소견을 함께 나열하고, CXR은 선별 보조일 뿐 확정적 배제·진단은 조영증강 CTA로 함을 명확히.</div>
+        <div class="src"><b>근거</b> EAST Blunt Aortic Injury PMG / ATLS 10th · <span class="cite">ACR Appropriateness Criteria blunt chest trauma–suspected aortic injury; EAST Blunt Aortic Injury PMG; ATLS 10th ed (mediastinal widening ~90% sensitive/~10% specific; secondary CXR signs and CTA as definitive study).</span></div>
+      </div>
+    </section>
+
+  <h2>과장 항목 8건 — 참고</h2>
+  <div class="note">이미 일부 반영됐거나 과장된 지적입니다. 반영 시 가볍게 다루거나 생략 가능.</div>
+  
+  <div class="item over">
+    <div class="item-head">
+      <span class="badge over">과장</span>
+      <span class="field">급성 대동맥 박리 · 배제 접근</span>
+      <span class="idtag">8-2</span>
+    </div>
+    <div class="issue"><b>지적</b> D-dimer 배제 전략의 핵심 조건이 불명확함. 가이드라인의 rule-out은 'ADD-RS ≤1(저위험) + D-dimer &lt;500 ng/mL' 조합에 한정되며, ADD-RS ≥2(중등도 이상)에서는 D-dimer 음성이라도 박리를 배제할 수 없다는 점, 그리고 짧은 박리·혈전화된 false lumen·IMH에서는 진성 박리에서도 D-dimer가 위음성일 수 있다는 점이 명시되지 않음.</div>
+    <div class="fix"><b>검증관 판정</b> The central asserted gap is already substantially covered: the current ruleOut text states D-dimer negativity is adjunctive only in LOW clinical probability and that at moderate-or-higher suspicion definitive imaging is required to exclude. That is the core safety logic the finding demands. What genuinely adds value is (a) naming the explicit ADD-RS ≤1 threshold and (b) the D-dimer false-negative caveat in IMH/thrombosed false lumen/short dissection — both real and literature-backed. But the primary claim ('핵심 조건이 불명확함 / rule-out condition undefined') exaggerates; the tool already conveys that D-dimer cannot rule out beyond low risk. Kernel of truth, over-stated as a gap.</div>
+  </div>
+  <div class="item over">
+    <div class="item-head">
+      <span class="badge over">과장</span>
+      <span class="field">흉부 대동맥류 파열 또는 누출 · 고려 단서</span>
+      <span class="idtag">9-4</span>
+    </div>
+    <div class="issue"><b>지적</b> 결합조직질환은 언급했으나 2022 가이드라인이 Class 1으로 강조하는 대동맥류/박리의 가족력, 이첨대동맥판막, 구체적 유전증후군(Marfan, Loeys-Dietz, 혈관형 Ehlers-Danlos, Turner), 조절되지 않은 고혈압 같은 핵심 위험인자가 빠져 있음.</div>
+    <div class="fix"><b>검증관 판정</b> Kernel of truth: bicuspid aortic valve, family history of aortic aneurysm/dissection, and uncontrolled hypertension are genuinely guideline-emphasized risk factors absent from the current suspicionClues. However, the finding overreaches by claiming Marfan/Loeys-Dietz/vascular EDS are 'missing' — these are connective-tissue diseases already captured by the existing '결합조직질환' clue, so they are partly covered. This is a minor completeness enhancement to risk-factor listing, not a safety-critical gap in a rupture presentation (where the driving triggers — known aneurysm, sudden pain, shock, sentinel pain — are already present). Guideline backing for the added factors is real but the finding is exaggerated relative to what the tool already covers.</div>
+  </div>
+  <div class="item over">
+    <div class="item-head">
+      <span class="badge over">과장</span>
+      <span class="field">심낭염 / 심낭삼출 / 심장압전 · 자동 게이트</span>
+      <span class="idtag">10-2</span>
+    </div>
+    <div class="issue"><b>지적</b> 자동 게이트가 저혈압/JVD/POCUS effusion만 포함하여 기이맥·빈맥·심음감약(Beck 3징후 완성 요소)이 빠져 있다. 저혈압이 아직 뚜렷하지 않은 초기 대상부전 단계에서 기이맥/빈맥/JVD로 먼저 감지되는 경우를 놓칠 수 있다.</div>
+    <div class="fix"><b>검증관 판정</b> Kernel is valid: pulsus paradoxus is a guideline-listed early tamponade sign not in the automated gate, and adding it is reasonable. But the safety argument that early pre-hypotensive decompensation would be missed is weakened because raised JVD is ALREADY a gate trigger in the current mustNotMissGate, and elevated JVP is among the most consistent/early tamponade findings. The proposed 'tachycardia+JVD combo' is largely redundant with the existing JVD trigger, and tachycardia is nonspecific. Net: add pulsus paradoxus is worthwhile, but the 'would be missed' framing is exaggerated.</div>
+  </div>
+  <div class="item over">
+    <div class="item-head">
+      <span class="badge over">과장</span>
+      <span class="field">심낭염 / 심낭삼출 / 심장압전 · 배제 접근</span>
+      <span class="idtag">10-3</span>
+    </div>
+    <div class="issue"><b>지적</b> '압전은 echo로 배제'라고만 기술. 압전은 본질적으로 임상 진단(Cardiac tamponade is a clinical diagnosis)이며, echo는 삼출·혈역학 소견을 확인하는 보조 수단이다. 기이맥 부재가 임상적 배제에 유용(음성우도비 0.03)함을 반영하지 않았다.</div>
+    <div class="fix"><b>검증관 판정</b> The reviewer's statement that tamponade is fundamentally a clinical diagnosis is correct per ESC 2015, but the criticism of the ruleOut field is exaggerated. For rule-OUT specifically, the current text ('압전은 echo로 배제') is medically valid: absence of significant pericardial effusion on echo effectively excludes tamponade, and echo is the single most useful tool per ESC. The clinical-diagnosis nuance matters mainly for rule-IN (effusion present does not confirm tamponade). The proposed clinical+echo integration is a reasonable refinement, not a correction of an actual error; labeled minor and it is minor.</div>
+  </div>
+  <div class="item over">
+    <div class="item-head">
+      <span class="badge over">과장</span>
+      <span class="field">긴장성 기흉 · 먼저 확인할 검사·평가</span>
+      <span class="idtag">20-2</span>
+    </div>
+    <div class="issue"><b>지적</b> needle decompression이 실패할 수 있고(특히 전방 부위/짧은 바늘) 확정 치료는 chest tube라는 점은 있으나, 외상 환자에서 finger thoracostomy가 needle보다 신뢰성이 높아 최근 선호된다는 점이 강조되지 않음.</div>
+    <div class="fix"><b>검증관 판정</b> The clinical kernel is real: cadaveric/comparative data show simple (finger) thoracostomy resolves tension pneumothorax more reliably than needle decompression (~92% vs ~76%), and it is increasingly favored in trauma/intubated/arrest patients. However, the guideline attribution is loose — ATLS 10th edition primarily teaches needle decompression followed by chest tube and does not formally designate finger thoracostomy as the preferred first-line intervention (that preference derives from prehospital/critical-care literature, not an ATLS directive). The current tool already states needle decompression can fail and that chest tube is definitive, so the point is partly covered. Valid enhancement, but exaggerated as an ATLS 10th recommendation.</div>
+  </div>
+  <div class="item over">
+    <div class="item-head">
+      <span class="badge over">과장</span>
+      <span class="field">식도파열 · 배제 접근</span>
+      <span class="idtag">34-2</span>
+    </div>
+    <div class="issue"><b>지적</b> 수용성 조영 식도조영술의 위음성률이 높다(수용성 조영제 10~38%)는 점을 정량적으로 반영하지 않음. 단순히 '의심 지속 시 반복/대체 영상'으로만 처리되어, 수용성 조영 음성 후 희석 바륨(dilute barium) 추가 검사라는 표준 알고리즘이 빠져 있음(강한 의심 환자에서 수용성 음성 후 바륨으로 약 22%가 추가 진단됨).</div>
+    <div class="fix"><b>검증관 판정</b> The cited facts are accurate and guideline-sourced: StatPearls states water-soluble esophagram false-negative rate is 10-38% and that the study 'may be repeated with barium if the initial test with water-soluble contrast is negative'; the ~22% additional-detection figure with barium after negative water-soluble is from the Radiology contrast-media comparison literature. However, the safety-critical behavior the reviewer wants is already present in the current ruleOut, which requires high-quality CT/contrast study with no leak AND no clinical deterioration AND explicitly '의심 지속 시 반복/대체 영상' (repeat/alternative imaging if suspicion persists) — so a single negative water-soluble study is not treated as a valid rule-out. The tool also already lists CT esophagography, which current ED practice increasingly favors over barium. Thus the addition (explicit false-negative percentage and naming dilute barium) is a legitimate refinement but the must-not-miss guardrail is already covered; the 'algorithm is missing' framing is exaggerated.</div>
+  </div>
+  <div class="item over">
+    <div class="item-head">
+      <span class="badge over">과장</span>
+      <span class="field">담관염 · 먼저 확인할 검사·평가</span>
+      <span class="idtag">40-3</span>
+    </div>
+    <div class="issue"><b>지적</b> 패혈증 동반 시 lactate 측정(Surviving Sepsis 번들의 핵심 요소)이 명시되지 않음. 초음파는 총담관 결석 민감도가 낮아(약 20~50%) 음성이어도 배제 불가하며 MRCP/EUS가 더 민감하다는 점도 언급되지 않음.</div>
+    <div class="fix"><b>검증관 판정</b> Kernel of truth but graded minor and largely already covered. The two sub-claims are individually correct — Surviving Sepsis Campaign 2021 hour-1 bundle does include measuring lactate, and transabdominal ultrasound is insensitive for CBD stones (variably ~20-80% in the literature; poor for the stone itself though good for ductal dilation) so a negative US cannot exclude choledocholithiasis, with MRCP/EUS being more sensitive. However, the current initialTests field already lists 'sepsis bundle' (which encompasses lactate) and already lists 'ultrasound/CT/MRCP,' so the incremental value is limited. The genuinely novel point (negative US does not exclude CBD stones; add EUS) is a legitimate refinement but minor, hence overstated rather than a clean gap.</div>
+  </div>
+  <div class="item over">
+    <div class="item-head">
+      <span class="badge over">과장</span>
+      <span class="field">천공성 소화성 궤양 · 배제 접근</span>
+      <span class="idtag">73-3</span>
+    </div>
+    <div class="issue"><b>지적</b> '고품질 CT에서 free air/leak 없음'을 배제 기준으로 제시하나, WSES는 초기 CT가 최대 12%에서 정상일 수 있다고 명시한다. 단일 음성 CT만으로 완전 배제한다는 인상을 줄 수 있다.</div>
+    <div class="fix"><b>검증관 판정</b> Kernel is true and guideline-backed (WSES: 'up to 12% of patients with perforations may have a normal CT scan'), but it is already partly covered by the current ruleOut, which explicitly carries the caveat '단 microperforation 가능성은 임상 추적,' and it substantially overlaps with 73-2's triple-contrast-CT re-evaluation proposal. The mustNotMissGate ('복막염/free air') and pitfalls also already drive continued workup when peritonitis persists. The concrete escalation (repeat water-soluble contrast CT) is sound; note WSES frames diagnostic laparoscopy primarily as a treatment/therapeutic modality rather than a first diagnostic step, so that specific element is weaker. Reviewer self-acknowledges partial coverage — a legitimate but incremental minor wording reinforcement, not an independent uncovered gap.</div>
+  </div>
+
+  <h2>해결 확인 2건 (앞서 수정한 오류)</h2>
+  <div class="note">폐색전증·겸상적혈구 급성흉부증후군의 배제 로직 오류는 이미 수정됐고, 재검증에서 현재 문구가 올바르다고 확인됐습니다.</div>
+  
+  <div class="item ref">
+    <div class="item-head">
+      <span class="badge ref">해결됨</span>
+      <span class="field">폐색전증 · 배제 접근</span>
+      <span class="idtag">19-1</span>
+    </div>
+    <div class="fix"><b>검증관 판정</b> The finding attacks a strawman version of the tool. The CURRENT ruleOut text already states verbatim: '낮은/중등도 임상확률에서 고감도 D-dimer 음성이면 PE 배제(영상 불필요, 2019 ESC). D-dimer로 배제 불가한 것은 높은 임상확률뿐이며 이때는 CTPA/V-Q 영상으로 진행.' This already (a) includes intermediate probability in the D-dimer-exclusion group, (b) explicitly says no imaging needed, and (c) restricts mandatory imaging to HIGH probability only. The reviewer's proposed correction is essentially identical to the text already present, so there is no algorithm error to fix. The underlying guideline claim is correct, but as applied to the current text the issue does not exist.</div>
+  </div>
+  <div class="item ref">
+    <div class="item-head">
+      <span class="badge ref">해결됨</span>
+      <span class="field">겸상적혈구 급성흉부증후군 · 배제 접근</span>
+      <span class="idtag">69-1</span>
+    </div>
+    <div class="fix"><b>검증관 판정</b> The clinical kernel (normal initial CXR does NOT rule out ACS; infiltrates appear with delay; maintain high suspicion and repeat imaging) is genuinely guideline-supported and correct. HOWEVER the finding attacks a strawman: it claims the tool says '″CXR infiltrate와 증상이 없으면 낮음″' as a dangerous rule-out. The CURRENT ruleOut text already states the exact opposite and already implements the reviewer's proposed correction almost verbatim: '새 SCD 환자에서 흥통·호흡기 증상·저산소가 있으면 초기 CXR가 정상이어도 배제 불가 — 침윤은 증상 발생 24~72시간 후 지연 출현하므로 의심을 유지하고 12~24시간 내 CXR를 재평가.' The claimed defect does not exist in the current text; the fix is already present. Not a real issue given current text.</div>
+  </div>
+
+  <div class="foot">
+    검증 방법: 위험 감별 18개 질환 각각을 가이드라인 대조 에이전트가 1차 검토 → 별도 적대적 검증 에이전트가 웹검색으로 교차확인(반박 시도).
+    참조 가이드라인: 2023 ESC ACS, 2021 AHA/ACC/ASE Chest Pain, 2022 ACC/AHA Aortic, 2019 ESC PE, 2015 ESC Pericardial, ATLS 10th, Tokyo Guidelines 2018 등.
+    AI 생성 자료이며 임상 적용 전 원문 가이드라인 확인 필요.
+  </div>
+</div></body></html>

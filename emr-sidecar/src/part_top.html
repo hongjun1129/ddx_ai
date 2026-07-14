@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https: http:; img-src data:; base-uri 'none'; form-action 'none'">
+  <title>흉통 감별 사이드바</title>
+  <style>
+:root {
+  --face: #d4d0c8;
+  --face-l: #ece9e2;
+  --hi: #ffffff;
+  --sh: #9a9a9a;
+  --sh-d: #646464;
+  --ink: #000000;
+  --muted: #4a4a4a;
+  --navy: #000080;
+  --navy2: #1660c8;
+  --sel-soft: #fff3b0;
+  --danger: #c00000;
+  --green: #006600;
+  --maroon: #800000;
+  font-family: "굴림", Gulim, "돋움", Dotum, "맑은 고딕", "Malgun Gothic", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html { background: var(--face); color: var(--ink); }
+
+body { margin: 0; min-width: 300px; font-size: 12px; }
+
+button, input, select, textarea {
+  font: inherit;
+  color: var(--ink);
+  border-radius: 0;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.disease-row:focus-visible,
+.col-head:focus-visible {
+  outline: 1px dotted #000;
+  outline-offset: -3px;
+}
+
+input, select, textarea {
+  background: #fff;
+  border: 1px solid;
+  border-color: var(--sh-d) var(--hi) var(--hi) var(--sh-d);
+  padding: 2px 4px;
+}
+
+::-webkit-scrollbar { width: 14px; height: 14px; }
+::-webkit-scrollbar-track { background: var(--face-l); }
+::-webkit-scrollbar-thumb {
+  background: var(--face);
+  border: 1px solid;
+  border-color: var(--hi) var(--sh-d) var(--sh-d) var(--hi);
+}
+
+.button {
+  background: var(--face);
+  border: 1px solid var(--sh-d);
+  box-shadow: inset 1px 1px 0 var(--hi), inset -1px -1px 0 var(--sh);
+  padding: 3px 14px;
+  font-size: 12px;
+  color: var(--ink);
+}
+.button:active { box-shadow: inset 1px 1px 0 var(--sh), inset -1px -1px 0 var(--hi); }
+.button.primary { font-weight: 700; border-color: #000; }
+.button:disabled { color: #808080; text-shadow: 1px 1px 0 #fff; }
+
+.icon-button {
+  width: 21px;
+  height: 19px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: var(--face);
+  border: 1px solid var(--sh-d);
+  box-shadow: inset 1px 1px 0 var(--hi), inset -1px -1px 0 var(--sh);
+  font-size: 11px;
+  line-height: 1;
+  color: var(--ink);
+}
+.icon-button:active { box-shadow: inset 1px 1px 0 var(--sh), inset -1px -1px 0 var(--hi); }
+
+.app {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 100dvh;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 4px;
+  background: var(--face);
+  border: 1px solid;
+  border-color: var(--hi) var(--sh-d) var(--sh-d) var(--hi);
+}
+
+.bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 4px 3px 7px;
+  background: linear-gradient(90deg, var(--navy), var(--navy2));
+}
+.bar h1 { margin: 0; font-size: 12px; font-weight: 700; color: #fff; }
+.bar-note {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  color: #ccd6ec;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bar-actions { display: flex; gap: 3px; align-items: center; }
+
+.note-box {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 5px;
+  background: var(--face);
+  border: 1px solid;
+  border-color: var(--sh) var(--hi) var(--hi) var(--sh);
+}
+#clinical-note {
+  width: 100%;
+  resize: vertical;
+  min-height: 50px;
+  padding: 3px 5px;
+  line-height: 1.5;
+  font-size: 12px;
+}
+.note-actions { display: flex; align-items: center; gap: 6px; }
+.status-line {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.status-line.error { color: var(--danger); }
+.status-line.ok { color: var(--green); }
+.status-line.busy { color: var(--navy); }
+
+.ddx {
+  flex: 1;
+  min-height: 130px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+.ddx-col {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid;
+  border-color: var(--sh-d) var(--hi) var(--hi) var(--sh-d);
+}
+.col-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  background: var(--face);
+  border: 1px solid var(--sh-d);
+  box-shadow: inset 1px 1px 0 var(--hi), inset -1px -1px 0 var(--sh);
+  padding: 3px 6px;
+  text-align: left;
+  font-size: 12px;
+}
+.col-head:active { box-shadow: inset 1px 1px 0 var(--sh), inset -1px -1px 0 var(--hi); }
+.col-head::after { content: "▼"; font-size: 8px; color: #333; }
+.col-title { font-weight: 700; }
+.col-head.danger .col-title { color: var(--danger); }
+.col-head.common .col-title { color: var(--navy); }
+.col-count { margin-left: auto; font-size: 11px; color: #333; }
+
+.ddx-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: #fff;
+}
+.disease-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  text-align: left;
+  background: #fff;
+  border: 0;
+  border-bottom: 1px solid #e2e2de;
+  padding: 3px 6px;
+  font-size: 12px;
+  color: var(--ink);
+}
+.disease-row:hover { background: var(--sel-soft); }
+.row-index { flex: none; min-width: 14px; text-align: right; color: #666; font-size: 11px; }
+.row-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.disease-row.ruled-out .row-name { color: #808080; text-decoration: line-through; }
+.evidence-chip {
+  flex: none;
+  font-size: 11px;
+  color: var(--navy);
+  background: #eef3fb;
+  border: 1px solid #b0c0da;
+  padding: 0 4px;
+}
+.state-chip { flex: none; font-size: 11px; border: 1px solid; padding: 0 4px; }
+.state-chip.concern { color: #8a5200; border-color: #c8a24a; background: #fdf3d8; }
+.state-chip.low { color: #555; border-color: #aaa; background: #f0f0ec; }
+.state-chip.ruled { color: #777; border-color: #bbb; background: #e8e8e4; }
+
+.summary {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  max-height: 30dvh;
+  background: #fff;
+  border: 1px solid;
+  border-color: var(--sh-d) var(--hi) var(--hi) var(--sh-d);
+}
+.summary h2 {
+  flex: none;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--navy);
+  background: var(--face);
+  border-bottom: 1px solid var(--sh-d);
+  box-shadow: inset 1px 1px 0 var(--hi);
+  padding: 3px 6px;
+}
+.next-list {
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px 10px;
+  padding: 3px 6px;
+  background: #fff;
+}
+@media (max-width: 400px) {
+  .next-list { grid-template-columns: 1fr; }
+}
+.next-item { display: flex; align-items: center; gap: 4px; min-width: 0; padding: 1px 0; }
+.kind-icon {
+  flex: none;
+  font-size: 11px;
+  padding: 0 3px;
+  border: 1px solid;
+  background: #f4f2ec;
+}
+.kind-icon.history { color: var(--navy); border-color: #9aa8c8; }
+.kind-icon.exam { color: var(--maroon); border-color: #c8a0a0; }
+.kind-icon.test { color: var(--green); border-color: #9cc09c; }
+.next-label {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.state-select { flex: none; width: 78px; font-size: 11px; padding: 1px 2px; }
+.next-empty, .group-empty { color: #555; font-size: 11px; padding: 4px 6px; }
+
+.confirm-box {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #fff;
+  border: 1px solid;
+  border-color: var(--sh-d) var(--hi) var(--hi) var(--sh-d);
+  padding: 5px 7px;
+}
+.confirm-head { display: flex; align-items: center; gap: 8px; }
+.confirm-head h2 { margin: 0; font-size: 12px; font-weight: 700; color: var(--maroon); }
+.confirm-head .button { margin-left: auto; padding: 3px 12px; font-size: 11.5px; }
+.confirm-list { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; min-height: 20px; }
+.confirm-empty { font-size: 11px; color: #667; }
+.dx-chip { display: inline-flex; align-items: center; gap: 2px; background: #eef3fb; border: 1px solid #9aa8c8; padding: 1px 2px 1px 7px; font-size: 12px; color: var(--navy); }
+.dx-chip.free { background: #eef7ee; border-color: #9cc09c; color: var(--green); }
+.dx-chip-x { border: 0; background: none; color: inherit; font-size: 13px; line-height: 1; padding: 0 3px; }
+.dx-chip-x:hover { color: var(--danger); }
+.confirm-add { display: flex; gap: 4px; }
+.confirm-add input { flex: 1; font-size: 11.5px; padding: 2px 5px; }
+
+.row-x {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  font-size: 12px;
+  line-height: 1;
+  color: #b8b8b0;
+}
+.row-x:hover { color: var(--danger); }
+.disease-row.ruled-out .row-x { color: #8fbf8f; }
+.disease-row.ruled-out .row-x:hover { color: var(--green); }
+.confirmed-chip { flex: none; font-size: 10px; font-weight: 700; color: #fff; background: var(--maroon); padding: 0 5px; }
+
+.detail-status-controls { display: flex; align-items: center; gap: 6px; }
+.confirm-btn { padding: 3px 10px; font-size: 11.5px; white-space: nowrap; }
+.confirm-btn.on { background: var(--maroon); color: #fff; border-color: #000; box-shadow: none; }
+
+#summary-text {
+  width: 100%;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.55;
+  padding: 8px;
+  resize: vertical;
+  min-height: 300px;
+  border: 1px solid;
+  border-color: var(--sh-d) var(--hi) var(--hi) var(--sh-d);
+}
+
+.modal {
+  border: 1px solid #000;
+  padding: 0;
+  width: min(600px, 94vw);
+  background: var(--face);
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+}
+.modal::backdrop { background: rgba(80, 80, 80, 0.3); }
+.modal-shell {
+  display: flex;
+  flex-direction: column;
+  max-height: 88dvh;
+  border: 1px solid;
+  border-color: var(--hi) var(--sh-d) var(--sh-d) var(--hi);
+}
+.modal-header {
+  flex: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 4px 3px 7px;
+  background: linear-gradient(90deg, var(--navy), var(--navy2));
+}
+.modal-kicker { display: block; font-size: 10px; color: #c0cce6; letter-spacing: 0.04em; }
+.modal-header h2 { margin: 0; font-size: 12px; font-weight: 700; color: #fff; }
+.modal-header p { margin: 1px 0 0; color: #d4ddf0; font-size: 11px; }
+.detail-kcd { color: #ffe08a !important; }
+.modal-body {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 7px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  background: var(--face);
+}
+.modal-footer {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-top: 1px solid var(--sh);
+  box-shadow: inset 0 1px 0 var(--hi);
+}
+.footer-note { margin-right: auto; font-size: 11px; color: #444; }
+
+.detail-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 7px;
+  background: var(--face-l);
+  border: 1px solid var(--sh);
+}
+.detail-status strong { display: block; font-size: 12px; }
+.detail-status small { display: block; color: #555; font-size: 11px; }
+.detail-status select { width: auto; font-size: 12px; }
+.detail-section h3 {
+  margin: 0 0 3px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--navy);
+  border-bottom: 1px solid var(--sh);
+  padding-bottom: 2px;
+}
+.detail-copy {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.55;
+  white-space: pre-line;
+  background: #fff;
+  border: 1px solid;
+  border-color: var(--sh-d) var(--hi) var(--hi) var(--sh-d);
+  padding: 5px 7px;
+}
+.detail-copy.warning { color: var(--danger); }
+.current-evidence { display: flex; flex-wrap: wrap; gap: 3px; }
+.evidence-pill {
+  font-size: 11px;
+  color: var(--navy);
+  background: #eef3fb;
+  border: 1px solid #b0c0da;
+  padding: 1px 6px;
+}
+.evidence-pill.negative { color: #666; background: #f0f0ec; border-color: #b8b8b0; }
+.detail-check-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 6px;
+}
+.detail-check-column h4 { margin: 0 0 3px; font-size: 11px; font-weight: 700; color: #444; }
+.mini-check {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: #fff;
+  border: 1px solid #a8a8a0;
+  padding: 4px;
+  margin-bottom: 3px;
+}
+.mini-check strong { font-size: 11px; font-weight: 400; line-height: 1.4; }
+.mini-check .state-select { width: 100%; }
+
+.group-modal { width: min(780px, 96vw); }
+.group-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 2px 4px;
+}
+.group-grid .disease-row {
+  border: 1px solid #b0b0a8;
+  padding: 2px 5px;
+  font-size: 12px;
+  background: #fff;
+}
+.group-grid .disease-row:hover { background: var(--sel-soft); }
+
+.security-note {
+  background: #ffffe1;
+  border: 1px solid #808080;
+  color: var(--ink);
+  padding: 5px 7px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.connection-switch {
+  border: 1px solid;
+  border-color: var(--sh) var(--hi) var(--hi) var(--sh);
+  padding: 5px 8px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.connection-switch legend { font-size: 11px; padding: 0 3px; }
+.connection-switch label { display: flex; align-items: center; gap: 5px; font-size: 12px; }
+.connection-switch input { width: auto; }
+.settings-block { display: flex; flex-direction: column; gap: 3px; }
+.settings-block > label, .model-label { font-size: 11px; color: #333; font-weight: 700; }
+.settings-block input, #model, #provider { width: 100%; padding: 2px 4px; font-size: 12px; }
+.settings-block p { margin: 0; font-size: 11px; color: #444; line-height: 1.5; }
+.secret-field { display: flex; gap: 4px; }
+.secret-field input { flex: 1; }
+.text-button {
+  border: 1px solid var(--sh-d);
+  background: var(--face);
+  box-shadow: inset 1px 1px 0 var(--hi), inset -1px -1px 0 var(--sh);
+  font-size: 11px;
+  padding: 1px 8px;
+  color: var(--ink);
+}
+.text-button:active { box-shadow: inset 1px 1px 0 var(--sh), inset -1px -1px 0 var(--hi); }
+.confirm-row { display: flex; align-items: flex-start; gap: 5px; font-size: 11px; color: #333; line-height: 1.5; }
+.confirm-row input { width: auto; margin-top: 1px; }
+
+.review-summary { font-size: 11px; color: #333; }
+.review-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border: 1px solid #a8a8a0;
+  padding: 4px 6px;
+}
+.review-item > div { flex: 1; min-width: 0; }
+.review-item strong { display: block; font-size: 12px; font-weight: 700; }
+.review-item small {
+  display: block;
+  color: #555;
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.review-item select { flex: none; width: 100px; font-size: 11px; }
+.review-remove {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: var(--face);
+  border: 1px solid var(--sh-d);
+  box-shadow: inset 1px 1px 0 var(--hi), inset -1px -1px 0 var(--sh);
+  font-size: 11px;
+}
+.review-remove:active { box-shadow: inset 1px 1px 0 var(--sh), inset -1px -1px 0 var(--hi); }
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 12px;
+  transform: translateX(-50%);
+  background: #ffffe1;
+  color: var(--ink);
+  border: 1px solid #000;
+  font-size: 11px;
+  padding: 4px 10px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  max-width: 90vw;
+}
+.toast.show { opacity: 1; }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="bar">
+      <h1>흉통 감별</h1>
+      <span class="bar-note" role="note" title="본 도구는 임상 의사결정 보조(Clinical Decision Support) 목적으로 제공되며, 의료진의 전문적 판단과 진료 행위를 대체할 수 없습니다.">임상 의사결정 보조 도구 · 의료진의 전문적 판단을 대체할 수 없음</span>
+      <div class="bar-actions">
+        <button class="icon-button" id="open-settings" type="button" aria-label="AI 연결 설정" title="AI 연결 설정"><span aria-hidden="true">⚙</span></button>
+      </div>
+    </header>
+
+    <section class="note-box" aria-label="의사 자유 입력">
+      <label class="sr-only" for="clinical-note">의사 서술</label>
+      <textarea id="clinical-note" rows="3" spellcheck="false" placeholder="임상 정보 자유 입력 — 예: 67세 남성, 2시간 전부터 조이는 흉통, 좌측 팔 방사, 식은땀. ECG ST elevation 없음, troponin pending. (이름·등록번호 제외)"></textarea>
+      <div class="note-actions">
+        <span class="status-line" id="analysis-status" role="status" aria-live="polite"></span>
+        <button class="button primary" id="analyze-note" type="button"><span>서술 분석</span></button>
+      </div>
+    </section>
+
+    <section class="ddx" aria-label="예상 감별진단">
+      <div class="ddx-col">
+        <button class="col-head danger" id="danger-head" type="button" title="위험 감별 전체 목록 보기">
+          <span class="col-title">위험 감별</span>
+          <span class="col-count" id="danger-count"></span>
+        </button>
+        <div class="ddx-list" id="danger-list"></div>
+      </div>
+      <div class="ddx-col">
+        <button class="col-head common" id="common-head" type="button" title="일반 감별 전체 목록 보기">
+          <span class="col-title">일반 감별</span>
+          <span class="col-count" id="common-count"></span>
+        </button>
+        <div class="ddx-list" id="common-list"></div>
+      </div>
+    </section>
+
+    <section class="confirm-box" aria-labelledby="confirm-heading">
+      <div class="confirm-head">
+        <h2 id="confirm-heading">확정 진단</h2>
+        <button class="button primary" id="gen-summary" type="button">진료 요약 생성</button>
+      </div>
+      <div id="confirm-list" class="confirm-list"></div>
+      <div class="confirm-add">
+        <label class="sr-only" for="freetext-dx">확정 진단 직접 입력</label>
+        <input id="freetext-dx" type="text" placeholder="목록에 없는 진단명 입력 후 Enter로 추가">
+      </div>
+    </section>
+
+    <section class="summary" aria-labelledby="summary-heading">
+      <h2 id="summary-heading">종합 확인 항목</h2>
+      <div id="next-checks" class="next-list"></div>
+    </section>
+  </div>
+
+  <dialog id="group-dialog" class="modal group-modal" aria-labelledby="group-title">
+    <div class="modal-shell">
+      <header class="modal-header">
+        <div>
+          <span class="modal-kicker" id="group-kicker"></span>
+          <h2 id="group-title"></h2>
+        </div>
+        <button class="icon-button close-group" type="button" aria-label="닫기">×</button>
+      </header>
+      <div class="modal-body">
+        <div id="group-list" class="group-grid"></div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="disease-dialog" class="modal" aria-labelledby="detail-name">
+    <div class="modal-shell">
+      <header class="modal-header">
+        <div>
+          <span class="modal-kicker" id="detail-category"></span>
+          <h2 id="detail-name"></h2>
+          <p id="detail-en"></p>
+          <p id="detail-kcd" class="detail-kcd" hidden></p>
+        </div>
+        <button class="icon-button close-disease" type="button" aria-label="닫기">×</button>
+      </header>
+      <div class="modal-body" id="disease-detail"></div>
+      <footer class="modal-footer">
+        <span class="footer-note">상태 변경은 의사 판단의 기록이며 자동 판정이 아닙니다.</span>
+        <button class="button close-disease" type="button">닫기</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <dialog id="review-dialog" class="modal" aria-labelledby="review-heading">
+    <div class="modal-shell">
+      <header class="modal-header">
+        <div>
+          <span class="modal-kicker">PHYSICIAN REVIEW</span>
+          <h2 id="review-heading">서술에서 찾은 항목 확인</h2>
+          <p>틀린 값은 수정하고, 근거가 불충분한 항목은 제외한 뒤 적용하세요.</p>
+        </div>
+        <button class="icon-button close-review" type="button" aria-label="닫기">×</button>
+      </header>
+      <div class="modal-body">
+        <div id="review-summary" class="review-summary"></div>
+        <div id="review-items"></div>
+      </div>
+      <footer class="modal-footer">
+        <button class="button close-review" type="button">취소</button>
+        <button class="button primary" id="apply-review" type="button">확인한 항목 적용</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <dialog id="summary-dialog" class="modal" aria-labelledby="summary-dialog-heading">
+    <div class="modal-shell">
+      <header class="modal-header">
+        <div>
+          <span class="modal-kicker">CLINICAL SUMMARY</span>
+          <h2 id="summary-dialog-heading">진료 요약 안내문</h2>
+          <p>도구가 생성한 초안입니다. 의사가 검토·수정 후 사용하세요.</p>
+        </div>
+        <button class="icon-button close-summary" type="button" aria-label="닫기">×</button>
+      </header>
+      <div class="modal-body">
+        <label class="sr-only" for="summary-text">진료 요약 초안</label>
+        <textarea id="summary-text" spellcheck="false"></textarea>
+      </div>
+      <footer class="modal-footer">
+        <span class="footer-note">임상 의사결정 보조 도구 생성 초안 · 최종 판단은 의료진</span>
+        <button class="button close-summary" type="button">닫기</button>
+        <button class="button primary" id="copy-summary" type="button">클립보드 복사</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <dialog id="settings-dialog" class="modal" aria-labelledby="settings-heading">
+    <form method="dialog" class="modal-shell" id="settings-form">
+      <header class="modal-header">
+        <div>
+          <span class="modal-kicker">AI CONNECTION</span>
+          <h2 id="settings-heading">서술 인식 연결 설정</h2>
+        </div>
+        <button class="icon-button close-dialog" type="button" aria-label="닫기">×</button>
+      </header>
+      <div class="modal-body">
+        <div class="security-note">정적 HTML은 API 키를 숨길 수 없습니다. 운영 환경에서는 병원 프록시 연결을 사용하세요.</div>
+
+        <fieldset class="connection-switch">
+          <legend>연결 방식</legend>
+          <label>
+            <input type="radio" name="connection-mode" value="proxy" checked>
+            <span><strong>병원/개발 프록시</strong> · 권장</span>
+          </label>
+          <label>
+            <input type="radio" name="connection-mode" value="direct">
+            <span><strong>API 직접 연결</strong> · 로컬 시험 전용</span>
+          </label>
+        </fieldset>
+
+        <div id="proxy-settings" class="settings-block">
+          <label for="proxy-url">프록시 URL</label>
+          <input id="proxy-url" type="url" autocomplete="off" placeholder="https://hospital.example/api/openai/responses">
+          <p>프록시가 서버 측 키를 넣어 선택한 AI 제공자 API로 전달하고 원본 응답 JSON을 반환해야 합니다.</p>
+        </div>
+
+        <div id="direct-settings" class="settings-block" hidden>
+          <label for="api-key">API 키</label>
+          <div class="secret-field">
+            <input id="api-key" type="password" autocomplete="off" placeholder="입력한 키는 저장하지 않음">
+            <button id="toggle-key" type="button" class="text-button">표시</button>
+          </div>
+          <label class="confirm-row">
+            <input id="direct-confirm" type="checkbox">
+            <span>실제 환자 자료가 아닌 합성·완전 비식별 시험이며, 키 노출 위험을 확인했습니다.</span>
+          </label>
+        </div>
+
+        <div class="settings-block">
+          <label class="model-label" for="provider">AI 제공자</label>
+          <select id="provider">
+            <option value="anthropic">Claude (Anthropic)</option>
+            <option value="openai">OpenAI</option>
+          </select>
+        </div>
+
+        <div class="settings-block">
+          <label class="model-label" for="model">모델</label>
+          <select id="model"></select>
+        </div>
+      </div>
+      <footer class="modal-footer">
+        <button class="button close-dialog" type="button">취소</button>
+        <button class="button primary" id="save-settings" type="button">이 세션에 적용</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>

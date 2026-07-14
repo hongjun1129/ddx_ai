@@ -1,0 +1,930 @@
+  <script>
+(function startEmrSidecar() {
+  "use strict";
+
+  const C = globalThis.SidecarCore;
+  if (!C) throw new Error("SidecarCore를 불러오지 못했습니다.");
+
+  const $ = (id) => document.getElementById(id);
+  const clinicalData = JSON.parse($("clinical-data").textContent);
+  const indexes = C.getDataIndexes(clinicalData);
+  const DANGER_LIMIT = 7;
+  const COMMON_LIMIT = 7;
+
+  const KCD_CODES = {};
+
+  const state = {
+    checklist: C.createInitialChecklistState(clinicalData),
+    diagnosisStates: {},
+    diseaseRows: [],
+    pendingReview: [],
+    pendingWarnings: [],
+    lastCandidateCount: 0,
+    groupDialogKind: null,
+    selectedDiagnosisNo: null,
+    confirmedNos: new Set(),
+    freeTextDxList: [],
+    settings: {
+      mode: "direct",
+      provider: "openai",
+      proxyUrl: "",
+      apiKey: "",
+      model: "gpt-5.4-nano",
+      directConfirmed: false,
+    },
+    caseRevision: 0,
+    activeAbortController: null,
+    analysisBusy: false,
+  };
+
+  let toastTimer = null;
+
+  function element(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined && text !== null) node.textContent = String(text);
+    return node;
+  }
+
+  function clearNode(node) {
+    while (node.firstChild) node.removeChild(node.firstChild);
+  }
+
+  function showToast(message, type = "") {
+    const toast = $("toast");
+    toast.textContent = message;
+    toast.className = `toast show${type ? ` ${type}` : ""}`;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toast.className = "toast";
+    }, 3600);
+  }
+
+  function setStatus(message, type = "") {
+    const node = $("analysis-status");
+    node.textContent = message || "";
+    node.className = `status-line${type ? ` ${type}` : ""}`;
+    node.title = message || "";
+  }
+
+  function showDialog(dialog) {
+    if (!dialog.open) dialog.showModal();
+  }
+
+  function closeDialog(dialog) {
+    if (dialog.open) dialog.close();
+  }
+
+  function stateOption(value, label = value) {
+    const option = element("option", "", label);
+    option.value = value;
+    return option;
+  }
+
+  function captureFocusAnchor(target) {
+    const container = target.closest("#next-checks, #disease-detail, #review-items");
+    if (!container?.id) return null;
+    const controls = [...container.querySelectorAll("button:not(:disabled), select:not(:disabled), input:not(:disabled), textarea:not(:disabled)")];
+    return { containerId: container.id, index: Math.max(0, controls.indexOf(target)) };
+  }
+
+  function restoreFocusAnchor(anchor) {
+    if (!anchor) return;
+    queueMicrotask(() => {
+      const container = $(anchor.containerId);
+      if (!container) return;
+      const controls = [...container.querySelectorAll("button:not(:disabled), select:not(:disabled), input:not(:disabled), textarea:not(:disabled)")];
+      const target = controls[Math.min(anchor.index, Math.max(0, controls.length - 1))];
+      if (target) {
+        target.focus();
+      } else {
+        container.tabIndex = -1;
+        container.focus();
+      }
+    });
+  }
+
+  function createItemStateSelect(itemId, className = "state-select") {
+    const select = element("select", className);
+    select.setAttribute("aria-label", `${indexes.checklistById.get(itemId)?.displayLabel || itemId} 상태`);
+    select.append(
+      stateOption(C.VALUE_UNKNOWN, "미확인"),
+      stateOption(C.VALUE_PRESENT, "있음/양성"),
+      stateOption(C.VALUE_ABSENT, "없음/음성"),
+      stateOption(C.VALUE_NA, "해당없음"),
+    );
+    select.value = state.checklist[itemId]?.value || C.VALUE_UNKNOWN;
+    select.addEventListener("change", () => {
+      const focusAnchor = captureFocusAnchor(select);
+      setChecklistValue(itemId, select.value, "manual", "", null, focusAnchor);
+    });
+    return select;
+  }
+
+  function setChecklistValue(itemId, value, source, quote = "", confidence = null, focusAnchor = null) {
+    if (!indexes.checklistById.has(itemId) || !C.EXTRACTION_VALUES.includes(value)) return;
+    state.checklist[itemId] = { value, source, quote, confidence };
+    renderAll();
+    restoreFocusAnchor(focusAnchor);
+  }
+
+  function diagnosisStateClass(value) {
+    if (value === C.DX_CONCERN) return "concern";
+    if (value === C.DX_LOW) return "low";
+    if (value === C.DX_RULED_OUT) return "ruled";
+    return "unassessed";
+  }
+
+  function stateChipLabel(value) {
+    if (value === C.DX_CONCERN) return "우려";
+    if (value === C.DX_LOW) return "낮음";
+    if (value === C.DX_RULED_OUT) return "배제";
+    return value;
+  }
+
+  function createDiseaseRow(row, index, options = {}) {
+    const diagnosis = row.diagnosis;
+    const confirmed = state.confirmedNos.has(diagnosis.no);
+    const button = element("button", `disease-row${diagnosis.isRedFlag ? " danger" : ""}${row.manualState === C.DX_RULED_OUT ? " ruled-out" : ""}`);
+    button.type = "button";
+    button.dataset.diagnosisNo = String(diagnosis.no);
+    button.title = `${diagnosis.nameKr}${diagnosis.nameEn ? ` · ${diagnosis.nameEn}` : ""}`;
+    const safetyLabel = diagnosis.isRedFlag ? "위험 감별, " : "";
+    const confirmLabel = confirmed ? "확정 진단, " : "";
+    const evidenceLabel = row.hasEvidence ? `기록 근거 ${row.evidence.length}개, ` : "";
+    button.setAttribute("aria-label", `${diagnosis.nameKr}, ${confirmLabel}${safetyLabel}${row.manualState}, ${evidenceLabel}확인 요소 보기`);
+    button.appendChild(element("span", "row-index", index));
+    button.appendChild(element("span", "row-name", diagnosis.nameKr));
+    if (confirmed) {
+      button.appendChild(element("span", "confirmed-chip", "확정"));
+    } else if (row.manualState !== C.DX_UNASSESSED) {
+      button.appendChild(element("span", `state-chip ${diagnosisStateClass(row.manualState)}`, stateChipLabel(row.manualState)));
+    } else if (row.hasEvidence) {
+      button.appendChild(element("span", "evidence-chip", `근거 ${row.evidence.length}`));
+    }
+    let clickTimer = null;
+    button.addEventListener("click", (event) => {
+      if (event.detail > 1) return;
+      clearTimeout(clickTimer);
+      clickTimer = setTimeout(() => openDiseaseDetail(diagnosis.no), 220);
+    });
+    button.addEventListener("dblclick", () => {
+      clearTimeout(clickTimer);
+      confirmDiagnosis(diagnosis.no);
+    });
+    if (options.showExclude) {
+      const ruled = row.manualState === C.DX_RULED_OUT;
+      const x = element("span", "row-x", ruled ? "↩" : "×");
+      x.setAttribute("role", "button");
+      x.tabIndex = 0;
+      x.title = ruled ? "배제 취소" : "이 진단 배제";
+      x.setAttribute("aria-label", `${diagnosis.nameKr} ${ruled ? "배제 취소" : "배제"}`);
+      const act = (event) => { event.preventDefault(); event.stopPropagation(); toggleExclude(diagnosis.no); };
+      x.addEventListener("click", act);
+      x.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") act(event); });
+      button.appendChild(x);
+    }
+    return button;
+  }
+
+  function fillDiseaseColumn(container, rows, limit) {
+    clearNode(container);
+    if (!rows.length) {
+      container.appendChild(element("div", "group-empty", "해당 질환이 없습니다."));
+      return;
+    }
+    rows.slice(0, limit).forEach((row, index) => container.appendChild(createDiseaseRow(row, index + 1)));
+  }
+
+  function groupRows(kind) {
+    return kind === "danger"
+      ? state.diseaseRows.filter((row) => row.diagnosis.isRedFlag)
+      : state.diseaseRows.filter((row) => !row.diagnosis.isRedFlag);
+  }
+
+  function renderDiseaseColumns() {
+    const dangerRows = groupRows("danger");
+    const commonRows = groupRows("common");
+    fillDiseaseColumn($("danger-list"), dangerRows, DANGER_LIMIT);
+    fillDiseaseColumn($("common-list"), commonRows, COMMON_LIMIT);
+    $("danger-count").textContent = `${Math.min(DANGER_LIMIT, dangerRows.length)}/${dangerRows.length}`;
+    $("common-count").textContent = `${Math.min(COMMON_LIMIT, commonRows.length)}/${commonRows.length}`;
+  }
+
+  function renderGroupDialog() {
+    if (!state.groupDialogKind) return;
+    const kind = state.groupDialogKind;
+    const rows = groupRows(kind);
+    $("group-kicker").textContent = kind === "danger" ? "RED FLAGS · 먼저 배제" : "GENERAL DDX";
+    $("group-title").textContent = kind === "danger" ? `위험 감별 전체 (${rows.length})` : `일반 감별 전체 (${rows.length})`;
+    const list = $("group-list");
+    const scroll = list.scrollTop;
+    clearNode(list);
+    rows.forEach((row, index) => list.appendChild(createDiseaseRow(row, index + 1, { showExclude: true })));
+    list.scrollTop = scroll;
+  }
+
+  function openGroupDialog(kind) {
+    state.groupDialogKind = kind;
+    renderGroupDialog();
+    showDialog($("group-dialog"));
+  }
+
+  function kindPresentation(kind) {
+    if (kind === "exam") return { short: "진찰", className: "exam" };
+    if (kind === "test") return { short: "검사", className: "test" };
+    return { short: "문진", className: "history" };
+  }
+
+  function renderNextChecks() {
+    const container = $("next-checks");
+    clearNode(container);
+    const items = C.selectNextChecks(clinicalData, state.checklist, state.diseaseRows, 2);
+
+    if (!items.length) {
+      container.appendChild(element("div", "next-empty", "현재 미확인 상태인 공통 확인 항목이 없습니다. 질환을 클릭해 개별 항목을 점검하세요."));
+      return;
+    }
+
+    for (const item of items) {
+      const presentation = kindPresentation(item.kind);
+      const row = element("div", "next-item");
+      row.appendChild(element("span", `kind-icon ${presentation.className}`, presentation.short));
+      const label = element("span", "next-label", item.label);
+      const related = item.relatedDiagnosisNames.length ? ` — 관련: ${item.relatedDiagnosisNames.join(" · ")}` : "";
+      label.title = `${item.label}${related}`;
+      row.append(label, createItemStateSelect(item.id));
+      container.appendChild(row);
+    }
+  }
+
+  function renderAll() {
+    state.diseaseRows = C.computeDiseaseRows(clinicalData, state.checklist, state.diagnosisStates);
+    renderDiseaseColumns();
+    renderConfirmSection();
+    renderNextChecks();
+    if ($("group-dialog").open && state.groupDialogKind) renderGroupDialog();
+    if ($("disease-dialog").open && state.selectedDiagnosisNo !== null) renderDiseaseDetail(state.selectedDiagnosisNo);
+  }
+
+  function toggleExclude(diagnosisNo) {
+    const no = Number(diagnosisNo);
+    if (state.diagnosisStates[no] === C.DX_RULED_OUT) delete state.diagnosisStates[no];
+    else state.diagnosisStates[no] = C.DX_RULED_OUT;
+    renderAll();
+  }
+
+  function toggleConfirm(diagnosisNo) {
+    const no = Number(diagnosisNo);
+    if (state.confirmedNos.has(no)) state.confirmedNos.delete(no);
+    else state.confirmedNos.add(no);
+    renderAll();
+    const name = indexes.diagnosisByNo.get(no)?.nameKr || "";
+    showToast(state.confirmedNos.has(no) ? `확정 진단 지정: ${name}` : `확정 지정 해제: ${name}`);
+  }
+
+  function confirmDiagnosis(diagnosisNo) {
+    const no = Number(diagnosisNo);
+    if (!state.confirmedNos.has(no)) {
+      state.confirmedNos.add(no);
+      renderAll();
+    }
+    const name = indexes.diagnosisByNo.get(no)?.nameKr || "";
+    showToast(`확정 진단 지정: ${name}`);
+  }
+
+  function addFreeTextDx() {
+    const input = $("freetext-dx");
+    const value = input.value.trim();
+    if (!value) return;
+    if (!state.freeTextDxList.includes(value)) state.freeTextDxList.push(value);
+    input.value = "";
+    renderConfirmSection();
+    input.focus();
+  }
+
+  function renderConfirmSection() {
+    const list = $("confirm-list");
+    clearNode(list);
+    const confirmed = [...state.confirmedNos].map((no) => indexes.diagnosisByNo.get(Number(no))).filter(Boolean);
+    for (const diagnosis of confirmed) {
+      const chip = element("span", "dx-chip");
+      const kcd = KCD_CODES[diagnosis.no];
+      chip.title = `${diagnosis.nameEn || ""}${kcd ? ` · KCD ${kcd.c}` : ""}`;
+      chip.appendChild(element("span", "", diagnosis.nameKr));
+      const x = element("button", "dx-chip-x", "×");
+      x.type = "button";
+      x.title = "확정 해제";
+      x.setAttribute("aria-label", `${diagnosis.nameKr} 확정 해제`);
+      x.addEventListener("click", () => toggleConfirm(diagnosis.no));
+      chip.appendChild(x);
+      list.appendChild(chip);
+    }
+    for (const text of state.freeTextDxList) {
+      const chip = element("span", "dx-chip free");
+      chip.appendChild(element("span", "", text));
+      const x = element("button", "dx-chip-x", "×");
+      x.type = "button";
+      x.title = "삭제";
+      x.setAttribute("aria-label", `${text} 삭제`);
+      x.addEventListener("click", () => {
+        state.freeTextDxList = state.freeTextDxList.filter((t) => t !== text);
+        renderConfirmSection();
+      });
+      chip.appendChild(x);
+      list.appendChild(chip);
+    }
+    if (!confirmed.length && !state.freeTextDxList.length) {
+      list.appendChild(element("span", "confirm-empty", "질환을 클릭해 '확정 진단으로 지정'하거나 아래에 직접 입력하세요."));
+    }
+  }
+
+  function shortText(value, max = 90) {
+    const s = String(value || "").replace(/\s+/g, " ").trim();
+    return s.length > max ? `${s.slice(0, max - 1)}…` : s;
+  }
+
+  function generateSummary() {
+    const lines = [];
+    lines.push("[진료 요약 안내문 · 초안]");
+    lines.push("");
+
+    lines.push("■ 확정/추정 진단");
+    const confirmed = [...state.confirmedNos].map((no) => indexes.diagnosisByNo.get(Number(no))).filter(Boolean);
+    let hasDx = false;
+    for (const diagnosis of confirmed) {
+      const kcd = KCD_CODES[diagnosis.no];
+      const kcdStr = kcd ? ` [KCD ${kcd.c} ${kcd.n}]` : "";
+      lines.push(`  · ${diagnosis.nameKr}${diagnosis.nameEn ? ` (${diagnosis.nameEn})` : ""}${kcdStr}`);
+      hasDx = true;
+    }
+    for (const text of state.freeTextDxList) {
+      lines.push(`  · ${text} (직접 입력)`);
+      hasDx = true;
+    }
+    if (!hasDx) lines.push("  · (미지정)");
+    lines.push("");
+
+    lines.push("■ 반드시 확인 · 미배제 위험 감별(Red flag)");
+    const activeRed = state.diseaseRows.filter((row) =>
+      row.diagnosis.isRedFlag && row.manualState !== C.DX_RULED_OUT && !state.confirmedNos.has(row.diagnosis.no));
+    if (!activeRed.length) {
+      lines.push("  · 없음 (위험 감별 모두 배제 또는 확정)");
+    } else {
+      for (const row of activeRed) {
+        const gate = shortText(row.diagnosis.mustNotMissGate, 44);
+        const note = gate && !/^항상 자동 게이트$/.test(gate) ? ` — ${gate}` : "";
+        lines.push(`  · ${row.diagnosis.nameKr}${note}`);
+      }
+    }
+    lines.push("");
+
+    lines.push("■ 추가 확인 · 팔로우업 필요 항목");
+    const checks = C.selectNextChecks(clinicalData, state.checklist, state.diseaseRows, 3);
+    for (const item of checks) lines.push(`  · ${item.label}`);
+    for (const diagnosis of confirmed) {
+      if (diagnosis.initialTests) lines.push(`  · [${diagnosis.nameKr}] 권고 확인: ${shortText(diagnosis.initialTests, 110)}`);
+    }
+    if (!checks.length && !confirmed.length) lines.push("  · (현재 해당 항목 없음)");
+    lines.push("");
+
+    const ruled = state.diseaseRows.filter((row) => row.manualState === C.DX_RULED_OUT);
+    if (ruled.length) {
+      lines.push("■ 배제된 감별 (참고)");
+      lines.push(`  · ${ruled.map((row) => row.diagnosis.nameKr).join(", ")}`);
+      lines.push("");
+    }
+
+    lines.push("────────────────────────────");
+    lines.push("본 요약은 임상 의사결정 보조 도구가 생성한 초안이며, 진단·처방·기록의 최종 판단은 의료진이 확인·수정해야 합니다.");
+    return lines.join("\n");
+  }
+
+  function openSummary() {
+    $("summary-text").value = generateSummary();
+    showDialog($("summary-dialog"));
+  }
+
+  async function copySummary() {
+    const text = $("summary-text").value;
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast("진료 요약을 클립보드에 복사했습니다.");
+    } catch (_error) {
+      const area = $("summary-text");
+      area.focus();
+      area.select();
+      const ok = document.execCommand && document.execCommand("copy");
+      showToast(ok ? "진료 요약을 복사했습니다." : "복사 실패 — 직접 선택해 복사하세요.", ok ? "" : "error");
+    }
+  }
+
+  function makeDetailSection(title, copy, warning = false) {
+    const section = element("section", "detail-section");
+    section.appendChild(element("h3", "", title));
+    section.appendChild(element("p", `detail-copy${warning ? " warning" : ""}`, copy || "데이터 없음"));
+    return section;
+  }
+
+  function renderCurrentEvidence(row) {
+    const section = element("section", "detail-section");
+    section.appendChild(element("h3", "", "현재 기록과 연결된 근거"));
+    const list = element("div", "current-evidence");
+    if (!row.evidence.length && !row.negative.length) {
+      list.appendChild(element("div", "next-empty", "아직 이 질환과 연결된 확인 결과가 없습니다."));
+    }
+    for (const evidence of row.evidence.slice(0, 8)) {
+      const text = evidence.quote ? `${evidence.label} — “${evidence.quote}”` : evidence.label;
+      list.appendChild(element("div", "evidence-pill", text));
+    }
+    for (const evidence of row.negative.slice(0, 5)) {
+      const text = evidence.quote ? `${evidence.label} 없음 — “${evidence.quote}”` : `${evidence.label} 없음`;
+      list.appendChild(element("div", "evidence-pill negative", text));
+    }
+    section.appendChild(list);
+    return section;
+  }
+
+  function renderMissingCheckColumn(title, items) {
+    const column = element("div", "detail-check-column");
+    column.appendChild(element("h4", "", title));
+    if (!items.length) {
+      column.appendChild(element("div", "group-empty", "현재 추가 항목 없음"));
+      return column;
+    }
+    for (const item of items) {
+      const row = element("div", "mini-check");
+      row.appendChild(element("strong", "", item.displayLabel || item.label));
+      row.appendChild(createItemStateSelect(item.id));
+      column.appendChild(row);
+    }
+    return column;
+  }
+
+  function renderDiseaseDetail(diagnosisNo) {
+    const row = state.diseaseRows.find((candidate) => Number(candidate.diagnosis.no) === Number(diagnosisNo));
+    if (!row) return;
+    const diagnosis = row.diagnosis;
+    state.selectedDiagnosisNo = Number(diagnosis.no);
+    $("detail-category").textContent = `${diagnosis.category || "기타"} · ${diagnosis.priority || "우선도 미상"}`;
+    $("detail-name").textContent = diagnosis.nameEn || diagnosis.nameKr;
+    $("detail-en").textContent = diagnosis.nameEn ? diagnosis.nameKr : "";
+    const kcd = KCD_CODES[diagnosis.no];
+    const kcdNode = $("detail-kcd");
+    if (kcd) {
+      kcdNode.textContent = `질병분류기호(KCD): ${kcd.c} ${kcd.n} — 세분류는 확진 후 확정`;
+      kcdNode.hidden = false;
+    } else {
+      kcdNode.hidden = true;
+    }
+
+    const body = $("disease-detail");
+    clearNode(body);
+    const status = element("div", "detail-status");
+    const statusCopy = element("div", "");
+    statusCopy.appendChild(element("strong", "", "의사가 판단한 현재 상태"));
+    statusCopy.appendChild(element("small", "", "AI가 이 값을 자동으로 바꾸지 않습니다."));
+    const statusSelect = element("select", "");
+    statusSelect.setAttribute("aria-label", `${diagnosis.nameKr} 임상 상태`);
+    for (const value of C.DX_STATES) statusSelect.appendChild(stateOption(value));
+    statusSelect.value = row.manualState;
+    statusSelect.addEventListener("change", () => {
+      const focusAnchor = captureFocusAnchor(statusSelect);
+      state.diagnosisStates[diagnosis.no] = statusSelect.value;
+      renderAll();
+      restoreFocusAnchor(focusAnchor);
+      showToast(`${diagnosis.nameKr}: ${statusSelect.value}`);
+    });
+    const isConfirmed = state.confirmedNos.has(diagnosis.no);
+    const confirmBtn = element("button", `button confirm-btn${isConfirmed ? " on" : ""}`, isConfirmed ? "✔ 확정 진단 (해제)" : "확정 진단으로 지정");
+    confirmBtn.type = "button";
+    confirmBtn.addEventListener("click", () => toggleConfirm(diagnosis.no));
+    const controls = element("div", "detail-status-controls");
+    controls.append(statusSelect, confirmBtn);
+    status.append(statusCopy, controls);
+    body.appendChild(status);
+
+    body.appendChild(renderCurrentEvidence(row));
+    body.appendChild(makeDetailSection("고려 단서", diagnosis.suspicionClues));
+    body.appendChild(makeDetailSection("먼저 확인할 검사·평가", diagnosis.initialTests));
+
+    const missing = C.getDiagnosisMissingItems(clinicalData, state.checklist, diagnosis, 4);
+    const missingSection = element("section", "detail-section");
+    missingSection.appendChild(element("h3", "", "이 환자에서 추가로 확인할 항목"));
+    const grid = element("div", "detail-check-grid");
+    grid.append(
+      renderMissingCheckColumn("추가 문진", missing.history),
+      renderMissingCheckColumn("진찰·활력", missing.exam),
+      renderMissingCheckColumn("검사·확인", missing.test),
+    );
+    missingSection.appendChild(grid);
+    body.appendChild(missingSection);
+
+    body.appendChild(makeDetailSection("확진 접근", diagnosis.ruleIn));
+    body.appendChild(makeDetailSection("배제 접근", diagnosis.ruleOut));
+    body.appendChild(makeDetailSection("임상적 유의사항 (Pitfalls)", diagnosis.pitfalls, true));
+  }
+
+  function openDiseaseDetail(diagnosisNo) {
+    renderDiseaseDetail(diagnosisNo);
+    showDialog($("disease-dialog"));
+  }
+
+  const PROVIDER_MODELS = {
+    anthropic: [
+      { id: "claude-opus-4-8", label: "claude-opus-4-8 · 기본/최고 품질" },
+      { id: "claude-sonnet-5", label: "claude-sonnet-5 · 속도·품질 균형" },
+      { id: "claude-haiku-4-5", label: "claude-haiku-4-5 · 저비용/고속" },
+    ],
+    openai: [
+      { id: "gpt-5.4-nano", label: "gpt-5.4-nano · 기본/저비용" },
+      { id: "gpt-5.4-mini", label: "gpt-5.4-mini · 품질 보강" },
+      { id: "gpt-5.4-nano-2026-03-17", label: "gpt-5.4-nano-2026-03-17 · 고정 스냅샷" },
+    ],
+  };
+
+  function readProvider() {
+    return $("provider").value === "openai" ? "openai" : "anthropic";
+  }
+
+  function populateModelOptions(provider, selected) {
+    const select = $("model");
+    clearNode(select);
+    for (const model of PROVIDER_MODELS[provider] || PROVIDER_MODELS.anthropic) {
+      select.appendChild(stateOption(model.id, model.label));
+    }
+    if ([...select.options].some((option) => option.value === selected)) select.value = selected;
+  }
+
+  function buildAnthropicRequest({ model, sourceText, candidates }) {
+    const openaiBody = C.buildOpenAIRequest({ model: "schema-source", sourceText, candidates });
+    return {
+      model,
+      max_tokens: 2048,
+      system: openaiBody.input[0].content,
+      messages: [{ role: "user", content: openaiBody.input[1].content }],
+      output_config: {
+        format: {
+          type: "json_schema",
+          schema: openaiBody.text.format.schema,
+        },
+      },
+    };
+  }
+
+  function buildAnthropicFetchConfig({ mode, proxyUrl, apiKey, requestBody }) {
+    const direct = mode === "direct";
+    const url = direct ? "https://api.anthropic.com/v1/messages" : String(proxyUrl || "");
+    const headers = { "Content-Type": "application/json" };
+    if (direct) {
+      headers["x-api-key"] = String(apiKey || "");
+      headers["anthropic-version"] = "2023-06-01";
+      headers["anthropic-dangerous-direct-browser-access"] = "true";
+    }
+    return {
+      url,
+      options: {
+        method: "POST",
+        headers,
+        body: JSON.stringify(requestBody),
+      },
+    };
+  }
+
+  function parseAnthropicResponse(payload) {
+    if (!payload || typeof payload !== "object") throw new Error("Claude 응답 형식이 올바르지 않습니다.");
+    if (payload.error) throw new Error(payload.error.message || "Claude API 오류가 발생했습니다.");
+    if (Array.isArray(payload.items)) return payload;
+    if (payload.stop_reason === "refusal") throw new Error("모델이 요청을 처리하지 않았습니다.");
+    if (payload.stop_reason === "max_tokens") throw new Error("Claude 응답이 완료되지 않았습니다: max_tokens");
+    const textBlock = (Array.isArray(payload.content) ? payload.content : [])
+      .find((block) => block?.type === "text" && typeof block.text === "string");
+    if (!textBlock) throw new Error("Claude 응답에 구조화된 출력이 없습니다.");
+    try {
+      return JSON.parse(textBlock.text);
+    } catch (_error) {
+      throw new Error("Claude의 구조화된 출력을 JSON으로 읽지 못했습니다.");
+    }
+  }
+
+  function readConnectionMode() {
+    return document.querySelector('input[name="connection-mode"]:checked')?.value || "proxy";
+  }
+
+  function updateSettingsVisibility() {
+    const mode = readConnectionMode();
+    $("proxy-settings").hidden = mode !== "proxy";
+    $("direct-settings").hidden = mode !== "direct";
+  }
+
+  function openSettings() {
+    const settings = state.settings;
+    const radio = document.querySelector(`input[name="connection-mode"][value="${settings.mode}"]`);
+    if (radio) radio.checked = true;
+    $("proxy-url").value = settings.proxyUrl;
+    $("api-key").value = settings.apiKey;
+    $("provider").value = settings.provider;
+    populateModelOptions(settings.provider, settings.model);
+    $("direct-confirm").checked = settings.directConfirmed;
+    $("api-key").type = "password";
+    $("toggle-key").textContent = "표시";
+    updateSettingsVisibility();
+    showDialog($("settings-dialog"));
+  }
+
+  function saveSettings() {
+    const mode = readConnectionMode();
+    const provider = readProvider();
+    const proxyUrl = $("proxy-url").value.trim();
+    const apiKey = $("api-key").value.trim();
+    const directConfirmed = $("direct-confirm").checked;
+    const model = $("model").value;
+
+    if (mode === "proxy" && !C.isAllowedProxyUrl(proxyUrl)) {
+      showToast("원격 프록시는 HTTPS만 허용됩니다. HTTP는 localhost/127.0.0.1에서만 사용할 수 있습니다.", "error");
+      $("proxy-url").focus();
+      return;
+    }
+    if (mode === "direct" && !apiKey) {
+      showToast("로컬 시험에 사용할 API 키를 입력하세요.", "error");
+      $("api-key").focus();
+      return;
+    }
+    if (mode === "direct" && !directConfirmed) {
+      showToast("직접 연결 주의사항을 확인해 주세요.", "error");
+      $("direct-confirm").focus();
+      return;
+    }
+
+    state.settings = { mode, provider, proxyUrl, apiKey, directConfirmed, model };
+    closeDialog($("settings-dialog"));
+    setStatus(`${mode === "proxy" ? "프록시" : "로컬 직접"} 연결을 이 세션에만 적용했습니다.`, "ok");
+  }
+
+  async function fetchExtraction(requestBody) {
+    const { mode, provider, proxyUrl, apiKey } = state.settings;
+    const request = provider === "openai"
+      ? C.buildFetchConfig({ mode, proxyUrl, apiKey, requestBody })
+      : buildAnthropicFetchConfig({ mode, proxyUrl, apiKey, requestBody });
+    const controller = state.activeAbortController;
+    if (!controller) throw new Error("분석 요청이 취소되었습니다.");
+    const timeout = setTimeout(() => controller.abort(), 45000);
+    try {
+      const response = await fetch(request.url, {
+        ...request.options,
+        signal: controller.signal,
+      });
+      let payload;
+      try {
+        payload = await response.json();
+      } catch (_error) {
+        throw new Error(`서버가 JSON이 아닌 응답을 반환했습니다. HTTP ${response.status}`);
+      }
+      if (!response.ok) throw new Error(payload?.error?.message || payload?.message || `API 요청 실패: HTTP ${response.status}`);
+      return payload;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  function connectionReady() {
+    if (state.settings.mode === "proxy") return C.isAllowedProxyUrl(state.settings.proxyUrl);
+    return Boolean(state.settings.apiKey && state.settings.directConfirmed);
+  }
+
+  function setAnalyzeBusy(busy) {
+    state.analysisBusy = busy;
+    const button = $("analyze-note");
+    button.disabled = busy;
+    button.querySelector("span").textContent = busy ? "분석 중…" : "서술 분석";
+  }
+
+  function buildSourceText() {
+    return $("clinical-note").value.trim();
+  }
+
+  async function analyzeNote() {
+    const sourceText = buildSourceText();
+    if (!sourceText) {
+      setStatus("임상 서술을 먼저 입력하세요.", "error");
+      $("clinical-note").focus();
+      return;
+    }
+    const identifiers = C.detectDirectIdentifiers(sourceText);
+    if (identifiers.length) {
+      setStatus(`전송 중단: ${identifiers.join(", ")} 감지. 직접식별정보를 제거하세요.`, "error");
+      return;
+    }
+    if (sourceText.length > 30000) {
+      setStatus("입력이 30,000자를 넘습니다. 핵심 기록만 남겨 주세요.", "error");
+      return;
+    }
+    if (!connectionReady()) {
+      setStatus("AI 연결 설정이 필요합니다.", "error");
+      openSettings();
+      return;
+    }
+
+    const candidates = C.buildCandidateChecklist(clinicalData, sourceText, 262);
+    const provider = state.settings.provider;
+    const requestBody = provider === "openai"
+      ? C.buildOpenAIRequest({ model: state.settings.model, sourceText, candidates })
+      : buildAnthropicRequest({ model: state.settings.model, sourceText, candidates });
+    const requestRevision = state.caseRevision;
+    const controller = new AbortController();
+    state.activeAbortController = controller;
+    state.lastCandidateCount = candidates.length;
+    setAnalyzeBusy(true);
+    setStatus("서술에서 명시된 사실을 찾는 중입니다…", "busy");
+
+    try {
+      const payload = await fetchExtraction(requestBody);
+      if (requestRevision !== state.caseRevision || sourceText !== buildSourceText()) return;
+      const parsed = provider === "openai" ? C.parseOpenAIResponse(payload) : parseAnthropicResponse(payload);
+      const validated = C.validateExtraction({ extracted: parsed, sourceText, candidates, data: clinicalData });
+      state.pendingReview = prepareReviewItems(validated.items);
+      state.pendingWarnings = validated.warnings;
+
+      if (!state.pendingReview.length) {
+        setStatus("원문 인용으로 확인 가능한 항목을 찾지 못했습니다. 서술을 보완해 보세요.");
+        return;
+      }
+      renderReviewDialog();
+      showDialog($("review-dialog"));
+      setStatus(`${state.pendingReview.length}개 후보 발견. 의사 확인 후에만 반영됩니다.`, "ok");
+    } catch (error) {
+      if (requestRevision !== state.caseRevision) return;
+      let message = error?.name === "AbortError" ? "API 응답 시간이 초과되었습니다." : (error?.message || "서술 인식에 실패했습니다.");
+      if (error instanceof TypeError && /fetch/i.test(error.message || "")) {
+        message = state.settings.mode === "direct"
+          ? "직접 연결이 브라우저 CORS/Origin 정책에 막혔을 수 있습니다. 프록시 연결을 사용해 주세요."
+          : "프록시에 연결하지 못했습니다. URL과 file:// Origin 허용 설정을 확인하세요.";
+      }
+      setStatus(message, "error");
+    } finally {
+      if (state.activeAbortController === controller) state.activeAbortController = null;
+      if (requestRevision === state.caseRevision) setAnalyzeBusy(false);
+    }
+  }
+
+  function prepareReviewItems(items) {
+    return (items || []).map((item) => ({
+      ...item,
+      included: true,
+      originalValue: item.value,
+      originalQuote: item.quote || "",
+      originalSource: item.source || "reviewed",
+    }));
+  }
+
+  function reviewSourceLabel(item) {
+    if (item.source === "physician-corrected") return "의사 수정";
+    return "AI 추출";
+  }
+
+  function renderReviewDialog() {
+    const summary = $("review-summary");
+    const included = state.pendingReview.filter((item) => item.included).length;
+    const warnings = state.pendingWarnings.length ? ` · ${state.pendingWarnings.join(" ")}` : "";
+    summary.textContent = `후보 ${state.lastCandidateCount}개 중 ${included}개 검토 대상${warnings}`;
+
+    const container = $("review-items");
+    clearNode(container);
+    for (const item of state.pendingReview) {
+      if (!item.included) continue;
+      const row = element("div", "review-item");
+      const copy = element("div", "");
+      copy.appendChild(element("strong", "", item.label));
+      const quote = item.quote ? `“${item.quote}”` : "인용 없음";
+      const small = element("small", "", `${reviewSourceLabel(item)} · ${item.section} · ${quote}`);
+      small.title = quote;
+      copy.appendChild(small);
+
+      const select = element("select", "");
+      select.setAttribute("aria-label", `${item.label} 추출 값`);
+      select.append(
+        stateOption(C.VALUE_PRESENT, "있음/양성"),
+        stateOption(C.VALUE_ABSENT, "없음/음성"),
+        stateOption(C.VALUE_UNKNOWN, "미확인/대기"),
+        stateOption(C.VALUE_NA, "해당없음"),
+      );
+      select.value = item.value;
+      select.addEventListener("change", () => {
+        const focusAnchor = captureFocusAnchor(select);
+        item.value = select.value;
+        if (item.value === item.originalValue) {
+          item.quote = item.originalQuote;
+          item.source = item.originalSource;
+        } else {
+          item.quote = "";
+          item.confidence = null;
+          item.source = "physician-corrected";
+        }
+        renderReviewDialog();
+        restoreFocusAnchor(focusAnchor);
+      });
+
+      const remove = element("button", "review-remove", "×");
+      remove.type = "button";
+      remove.setAttribute("aria-label", `${item.label} 제외`);
+      remove.addEventListener("click", () => {
+        const focusAnchor = captureFocusAnchor(remove);
+        item.included = false;
+        renderReviewDialog();
+        restoreFocusAnchor(focusAnchor);
+      });
+      row.append(copy, select, remove);
+      container.appendChild(row);
+    }
+    if (!included) container.appendChild(element("div", "next-empty", "적용할 항목이 없습니다."));
+  }
+
+  function applyReview() {
+    const selected = state.pendingReview.filter((item) => item.included);
+    for (const item of selected) {
+      state.checklist[item.id] = {
+        value: item.value,
+        source: item.source || "reviewed",
+        quote: item.quote || "",
+        confidence: item.confidence ?? null,
+      };
+    }
+    closeDialog($("review-dialog"));
+    state.pendingReview = [];
+    state.pendingWarnings = [];
+    renderAll();
+    setStatus(`확인한 ${selected.length}개 항목을 반영했습니다. 감별 목록이 갱신되었습니다.`, "ok");
+    showToast(`${selected.length}개 확인 결과를 반영했습니다.`);
+  }
+
+  function markCaseChanged() {
+    const wasAnalyzing = Boolean(state.activeAbortController);
+    const hadPendingReview = state.pendingReview.length > 0;
+    state.caseRevision += 1;
+    if (state.activeAbortController) state.activeAbortController.abort();
+    state.activeAbortController = null;
+    if (state.analysisBusy) setAnalyzeBusy(false);
+    if (hadPendingReview) {
+      state.pendingReview = [];
+      state.pendingWarnings = [];
+      closeDialog($("review-dialog"));
+    }
+    if (wasAnalyzing || hadPendingReview) setStatus("입력이 바뀌어 이전 인식 결과를 취소했습니다.");
+  }
+
+  function bindDialogDismiss(dialog, selector) {
+    dialog.querySelectorAll(selector).forEach((button) => button.addEventListener("click", () => closeDialog(dialog)));
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) closeDialog(dialog);
+    });
+  }
+
+  function setupEvents() {
+    $("open-settings").addEventListener("click", openSettings);
+    $("save-settings").addEventListener("click", saveSettings);
+    $("provider").addEventListener("change", () => populateModelOptions(readProvider(), ""));
+    document.querySelectorAll('input[name="connection-mode"]').forEach((radio) => radio.addEventListener("change", updateSettingsVisibility));
+    $("toggle-key").addEventListener("click", () => {
+      const input = $("api-key");
+      input.type = input.type === "password" ? "text" : "password";
+      $("toggle-key").textContent = input.type === "password" ? "표시" : "숨김";
+    });
+    $("analyze-note").addEventListener("click", analyzeNote);
+    $("apply-review").addEventListener("click", applyReview);
+    $("danger-head").addEventListener("click", () => openGroupDialog("danger"));
+    $("common-head").addEventListener("click", () => openGroupDialog("common"));
+    $("clinical-note").addEventListener("input", markCaseChanged);
+    $("gen-summary").addEventListener("click", openSummary);
+    $("freetext-dx").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") { event.preventDefault(); addFreeTextDx(); }
+    });
+    $("copy-summary").addEventListener("click", copySummary);
+
+    bindDialogDismiss($("settings-dialog"), ".close-dialog");
+    bindDialogDismiss($("review-dialog"), ".close-review");
+    bindDialogDismiss($("disease-dialog"), ".close-disease");
+    bindDialogDismiss($("group-dialog"), ".close-group");
+    bindDialogDismiss($("summary-dialog"), ".close-summary");
+    $("group-dialog").addEventListener("close", () => {
+      state.groupDialogKind = null;
+    });
+    $("disease-dialog").addEventListener("close", () => {
+      const trigger = document.querySelector(`[data-diagnosis-no="${state.selectedDiagnosisNo}"]`);
+      if (trigger instanceof HTMLElement) trigger.focus();
+    });
+  }
+
+  function init() {
+    const counts = clinicalData.meta?.counts || {};
+    if (!Array.isArray(clinicalData.diagnoses) || !Array.isArray(clinicalData.checklistItems)) throw new Error("임상 데이터 구조가 올바르지 않습니다.");
+    if (clinicalData.diagnoses.length !== counts.diagnoses || clinicalData.checklistItems.length !== counts.checklistItems) throw new Error("임상 데이터 개수 검증에 실패했습니다.");
+    setupEvents();
+    renderAll();
+    setStatus("질환명을 클릭하면 확인할 요소를 볼 수 있습니다.");
+  }
+
+  init();
+})();
+  </script>
+</body>
+</html>
